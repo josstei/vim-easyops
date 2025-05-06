@@ -1,4 +1,4 @@
-function! EasyOpsChoiceCB(id, result) abort
+function! s:executeCommand(id, result) abort
 	if a:result < 1
 		return
 	endif
@@ -40,7 +40,7 @@ function! easyops#OpenMenu() abort
 	if exists('*popup_menu')
 		call popup_menu(l:menu_items, #{
 			\ title: 'EasyOps: ' . l:ctx,
-			\ callback: 'EasyOpsChoiceCB'
+			\ callback: 's:executeCommand'
 			\ })
   else
 		let l:choices = ['Select action:']

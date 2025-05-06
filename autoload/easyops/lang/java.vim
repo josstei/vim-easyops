@@ -7,7 +7,6 @@ function! easyops#lang#java#GetMenuOptions() abort
 		let l:pom_dir = fnamemodify(l:pom_file, ':p:h')
  		let l:cd_cmd  = 'cd ' . shellescape(l:pom_dir) . ' && '
 		
-		echom 'wtf is this command: ' . l:cd_cmd . 'mvn clean'
 		call add(l:tasks, ['Maven: Clean',            l:cd_cmd . 'mvn clean'])
 		call add(l:tasks, ['Maven: Compile',          l:cd_cmd . 'mvn compile'])
 		call add(l:tasks, ['Maven: Test',             l:cd_cmd . 'mvn test'])

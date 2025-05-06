@@ -1,4 +1,4 @@
-function! easyops#javascript#GetMenuOptions() abort
+function! easyops#lang#javascript#GetMenuOptions() abort
 	let l:tasks = []
 	let l:pkg = findfile('package.json', '.;')
 	call add(l:tasks, ['Lint with ESLint', 'npm run lint'])

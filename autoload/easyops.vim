@@ -4,12 +4,14 @@ function! s:executeCommand(id, result) abort
 	endif
 
 	let l:index = a:result - 1
-	let l:cmd   = g:easyops_last_cmds[l:index]
+	let l:cmd   = g:easyops_cmds[l:index]
 	let l:shell = &shell
 	let l:flag  = &shellcmdflag
 	let l:cmd_esc = substitute(l:cmd, '"', '\\"', 'g')
 	let l:full = printf('%s %s "%s"', l:shell, l:flag, l:cmd_esc)
 
+	" need to change this to be more generic vs maven specific....will keep
+	" maven for testing for now
 	if l:cmd ==# 'EASYOPS_CREATE_CONFIG'
 		let l:pom_file = findfile('pom.xml', '.;')
 
@@ -35,60 +37,71 @@ function! s:executeCommand(id, result) abort
 endfunction
 
 function! easyops#LoadConfig(dir) abort
-  let l:config_file = a:dir . '/.easyops.json'
-  if filereadable(l:config_file)
-    let l:content = join(readfile(l:config_file), "\n")
-    try
-      let l:cfg = json_decode(l:content)
-      return l:cfg
-    catch /^Vim\%((\a\+)\)\=:E\w\+/
-      echohl WarningMsg
-      echom 'EasyOps: Failed to parse ' . l:config_file
-      echohl None
-      return {}
-    endtry
-  endif
-  return {}
+	let l:config_file = a:dir . '/.easyops.json'
+	if filereadable(l:config_file)
+		let l:content = join(readfile(l:config_file), "\n")
+		try
+			let l:cfg = json_decode(l:content)
+			return l:cfg
+		catch /^Vim\%((\a\+)\)\=:E\w\+/
+			echohl WarningMsg
+			echom 'EasyOps: Failed to parse ' . l:config_file
+			echohl None
+			return {}
+		endtry
+	endif
+	return {}
 endfunction
 
-function! easyops#OpenMenu() abort
-	let l:ft = &filetype
-	if l:ft ==# 'javascriptreact'
-		let l:ctx = 'react'
-	elseif l:ft ==# 'java'
-		let l:ctx = 'java'
-	elseif l:ft ==# 'javascript'
-		let l:ctx = 'javascript'
-	elseif l:ft ==# 'cpp' || l:ft ==# 'c++' || l:ft ==# 'c'
-		let l:ctx = 'cpp'
+function! easyops#OpenMenu(menuType) abort
+	let s:default_ft_map = {
+		\ 'javascriptreact': 'javascript',
+		\ 'javascript'     : 'javascript',
+		\ 'java'           : 'java',
+		\ 'c'              : 'cpp',
+		\ 'cpp'            : 'cpp',
+		\ 'c++'            : 'cpp',
+		\ }
+
+	let s:ft_map = extend(copy(s:default_ft_map),get(g:, 'easyops_filetype_map', {}), 'keep')
+
+	if a:menuType !=# ''
+		let l:ctx = a:menuType
+		let l:mod = 'menu'
 	else
-		echo "EasyOps: No menu available for filetype '" . l:ft . "'"
-		return
+		let l:ctx = get(s:ft_map, &filetype, '')
+		if empty(l:ctx)
+			echohl ErrorMsg | echom 'EasyOps: No menu for filetype "' . &filetype . '"' | echohl None
+			return
+		endif
+		let l:mod = 'lang'
 	endif
 
-	let l:tasks = call('easyops#lang#' . l:ctx . '#GetMenuOptions', [])
-	if empty(l:tasks)
-		echo "EasyOps: No actions defined for " . l:ctx
-		return
-	endif
-
-	let g:easyops_last_cmds = map(copy(l:tasks), 'v:val[1]')
+	let l:fn = printf('easyops#%s#%s#GetMenuOptions', l:mod, l:ctx)
+	let l:tasks = s:getTasks(l:fn,l:ctx)
+	let g:easyops_cmds = map(copy(l:tasks), 'v:val[1]')
 	let l:menu_items = map(copy(l:tasks), 'v:val[0]')
 
 	if exists('*popup_menu')
-		call popup_menu(l:menu_items, #{
-			\ title: 'EasyOps: ' . l:ctx,
-			\ callback: 's:executeCommand'
-			\ })
-  else
-		let l:choices = ['Select action:']
-		for i in range(1, len(l:menu_items))
-			call add(l:choices, printf("%d. %s", i, l:menu_items[i-1]))
-		endfor
+		call popup_menu(l:menu_items, #{ title: 'EasyOps: ' . l:ctx, callback: 's:executeCommand' })
+	else
+		let l:choices = ['Select action:'] + map(copy(l:menu_items), { i, v -> printf('%d. %s', i+1, v) })
 		let l:choice = inputlist(l:choices)
-		if l:choice >= 1 && l:choice <= len(g:easyops_last_cmds)
-			execute 'terminal ' . g:easyops_last_cmds[l:choice - 1]
+		if l:choice >= 1 && l:choice <= len(g:easyops_cmds)
+			execute 'terminal ' . g:easyops_cmds[l:choice - 1]
 		endif
 	endif
 endfunction
 
+function s:getTasks(fn,ctx) abort
+	try 
+		return call(a:fn, [])
+	catch /^Vim\%((\a\+)\)\=:E117/ 
+		echohl ErrorMsg | echom 'EasyOps: No menu defined for context "' . a:ctx . '"' | echohl None
+		return
+	endtry
+	if empty(l:tasks)
+		echohl WarningMsg | echom 'EasyOps: No actions defined for "' . l:ctx . '"' | echohl None
+		return
+	endif
+endfunction

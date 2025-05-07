@@ -2,6 +2,7 @@ function! s:executeCommand(id, result) abort
 	if a:result < 1
 		return
 	endif
+
 	let l:index = a:result - 1
 	let l:cmd   = g:easyops_last_cmds[l:index]
 	let l:shell = &shell
@@ -9,10 +10,47 @@ function! s:executeCommand(id, result) abort
 	let l:cmd_esc = substitute(l:cmd, '"', '\\"', 'g')
 	let l:full = printf('%s %s "%s"', l:shell, l:flag, l:cmd_esc)
 
+	if l:cmd ==# 'EASYOPS_CREATE_CONFIG'
+		let l:pom_file = findfile('pom.xml', '.;')
+
+		if empty(l:pom_file)
+			echohl ErrorMsg | echom 'EasyOps: Cannot find pom.xml to determine config location.' | echohl None
+			return
+		endif
+
+		let l:pom_dir = fnamemodify(l:pom_file, ':p:h')
+		let l:config_file = l:pom_dir . '/.easyops.json'
+
+		if filereadable(l:config_file)
+			echo 'EasyOps: Config already exists at ' . l:config_file
+			return
+		endif
+
+		call writefile(['{', '  "maven_opts": ""', '}'], l:config_file)
+		echo 'EasyOps: Created EasyOps config at ' . l:config_file
+		return
+	endif
+
 	execute 'belowright terminal ' . l:full
 endfunction
 
-" gotta make this a map
+function! easyops#LoadConfig(dir) abort
+  let l:config_file = a:dir . '/.easyops.json'
+  if filereadable(l:config_file)
+    let l:content = join(readfile(l:config_file), "\n")
+    try
+      let l:cfg = json_decode(l:content)
+      return l:cfg
+    catch /^Vim\%((\a\+)\)\=:E\w\+/
+      echohl WarningMsg
+      echom 'EasyOps: Failed to parse ' . l:config_file
+      echohl None
+      return {}
+    endtry
+  endif
+  return {}
+endfunction
+
 function! easyops#OpenMenu() abort
 	let l:ft = &filetype
 	if l:ft ==# 'javascriptreact'

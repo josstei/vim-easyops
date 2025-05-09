@@ -2,6 +2,7 @@ if exists('g:loaded_easyops')
   finish
 endif
 
+let g:easyops_pause_on_exit = 1
 let g:loaded_easyops = 1
 
 " code menu

@@ -1,39 +1,37 @@
 function! s:executeCommand(id, result) abort
-	if a:result < 1
-		return
-	endif
+  if a:result < 1
+    return
+  endif
 
-	let l:index = a:result - 1
-	let l:cmd   = g:easyops_cmds[l:index]
-	let l:shell = &shell
-	let l:flag  = &shellcmdflag
-	let l:cmd_esc = substitute(l:cmd, '"', '\\"', 'g')
-	let l:full = printf('%s %s "%s"', l:shell, l:flag, l:cmd_esc)
+  let l:index = a:result - 1
+  let l:cmd   = g:easyops_cmds[l:index]
 
-	" need to change this to be more generic vs maven specific....will keep
-	" maven for testing for now
-	if l:cmd ==# 'EASYOPS_CREATE_CONFIG'
-		let l:pom_file = findfile('pom.xml', '.;')
+	" TODO - this needs to be modular and not in the core executeCommand
+  if l:cmd ==# 'EASYOPS_CREATE_CONFIG'
+    let l:pom = findfile('pom.xml', '.;')
+    if empty(l:pom)
+      echohl ErrorMsg | echom 'EasyOps: Cannot find pom.xml to determine config location.' | echohl None
+      return
+    endif
+    let l:dir  = fnamemodify(l:pom, ':p:h')
+    let l:file = l:dir . '/.easyops.json'
+    if filereadable(l:file)
+      echo 'EasyOps: Config already exists at ' . l:file
+      return
+    endif
+    call writefile(['{', '  "maven_opts": ""', '}'], l:file)
+    echo 'EasyOps: Created EasyOps config at ' . l:file
+    return
+  endif
 
-		if empty(l:pom_file)
-			echohl ErrorMsg | echom 'EasyOps: Cannot find pom.xml to determine config location.' | echohl None
-			return
-		endif
+  if get(g:, 'easyops_pause_on_exit', 0)
+    let l:cmd .= ' ; echo "" ; echo "Press ENTER to close…" ; read'
+  endif
 
-		let l:pom_dir = fnamemodify(l:pom_file, ':p:h')
-		let l:config_file = l:pom_dir . '/.easyops.json'
+  let l:esc     = substitute(l:cmd, '"', '\\"', 'g')
+  let l:full    = printf('%s %s "%s"', &shell, &shellcmdflag, l:esc)
 
-		if filereadable(l:config_file)
-			echo 'EasyOps: Config already exists at ' . l:config_file
-			return
-		endif
-
-		call writefile(['{', '  "maven_opts": ""', '}'], l:config_file)
-		echo 'EasyOps: Created EasyOps config at ' . l:config_file
-		return
-	endif
-
-	execute 'belowright terminal ' . l:full
+  execute 'belowright terminal ++close ' . l:full
 endfunction
 
 function! easyops#LoadConfig(dir) abort
@@ -53,6 +51,8 @@ function! easyops#LoadConfig(dir) abort
 	return {}
 endfunction
 
+" TODO - break out portions of this into separate functions to make it a bit
+" more readable
 function! easyops#OpenMenu(menuType) abort
 	let s:default_ft_map = {
 		\ 'javascriptreact': 'javascript',

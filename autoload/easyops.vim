@@ -3,36 +3,43 @@ function! s:executeCommand(id, result) abort
     return
   endif
 
-  let l:index = a:result - 1
-  let l:cmd   = g:easyops_cmds[l:index]
+  let l:idx  = a:result - 1
+  let l:base = g:easyops_cmds[l:idx]
 
-	" TODO - this needs to be modular and not in the core executeCommand
-  if l:cmd ==# 'EASYOPS_CREATE_CONFIG'
+  if l:base[0] ==# ':'
+    execute l:base
+    return
+  endif
+
+  if l:base ==# 'EASYOPS_CREATE_CONFIG'
     let l:pom = findfile('pom.xml', '.;')
     if empty(l:pom)
       echohl ErrorMsg | echom 'EasyOps: Cannot find pom.xml to determine config location.' | echohl None
       return
     endif
-    let l:dir  = fnamemodify(l:pom, ':p:h')
-    let l:file = l:dir . '/.easyops.json'
-    if filereadable(l:file)
-      echo 'EasyOps: Config already exists at ' . l:file
+    let l:dir = fnamemodify(l:pom, ':p:h')
+    let l:cfg = l:dir . '/.easyops.json'
+    if filereadable(l:cfg)
+      echo 'EasyOps: Config already exists at ' . l:cfg
       return
     endif
-    call writefile(['{', '  "maven_opts": ""', '}'], l:file)
-    echo 'EasyOps: Created EasyOps config at ' . l:file
+    call writefile(['{', '  "maven_opts": ""', '}'], l:cfg)
+    echo 'EasyOps: Created EasyOps config at ' . l:cfg
     return
   endif
 
+  let l:cmd = l:base
   if get(g:, 'easyops_pause_on_exit', 0)
     let l:cmd .= ' ; echo "" ; echo "Press ENTER to close…" ; read'
   endif
 
-  let l:esc     = substitute(l:cmd, '"', '\\"', 'g')
-  let l:full    = printf('%s %s "%s"', &shell, &shellcmdflag, l:esc)
+  let l:esc  = substitute(l:cmd, '"', '\\"', 'g')
+  let l:full = printf('%s %s "%s"', &shell, &shellcmdflag, l:esc)
 
   execute 'belowright terminal ++close ' . l:full
+  execute 'file ' . string(l:base)
 endfunction
+
 
 function! easyops#LoadConfig(dir) abort
 	let l:config_file = a:dir . '/.easyops.json'

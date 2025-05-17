@@ -6,5 +6,5 @@ let g:loaded_easyops = 1
 
 command! EasyOps call easyops#menu#ShowCategories()
 
-nnoremap <silent> <leader>eo :EasyOps<CR>
+nnoremap <silent> <leader>m :EasyOps<CR>
 

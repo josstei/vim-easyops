@@ -18,43 +18,10 @@ function! easyops#LoadConfig(root) abort
   return l:cfg
 endfunction
 
-" function! easyops#ShowMenu() abort
-"   let l:cfg = easyops#LoadConfig(getcwd())
-"   let l:opts = easyops#menu#GetMenuOptions()
-" 
-"   if empty(l:opts)
-"     echohl WarningMsg | echom "EasyOps: No tasks available." | echohl None
-"     return
-"   endif
-" 
-"   let s:easyops_popup_opts = copy(l:opts)
-"   let l:labels = map(l:opts, {_, v -> v[0]})
-" 
-"   if exists('*popup_menu')
-"     call popup_menu(l:labels, #{
-"           \ title:       'EasyOps Tasks',
-"           \ cursorline:  v:true,
-"           \ mapping:     v:true,
-"           \ return_focus:v:true,
-"           \ callback:    'easyops#Execute',
-"           \ })
-"   else
-"     let l:choice = inputlist(['EasyOps Tasks:'] + l:labels) - 1
-" 
-"     if l:choice >= 0 && l:choice < len(l:opts)
-"       call easyops#Execute(0, l:choice + 1,l:opts)
-"     endif
-"   endif
-" endfunction
-
-function! easyops#Execute(winid,idx,opts) abort
+function! easyops#Execute(winid,idx) abort
   if a:idx <= 0 | return | endif
 
-  let l:pair = get(a:opts, a:idx - 1, [])
-
-  if len(l:pair) != 2 | return | endif
-
-  let l:base = l:pair[1]
+  let l:base = get(g:easyops_cmds, a:idx - 1, [])
   let l:cmd  = l:base
 
   if empty(l:cmd) | return | endif

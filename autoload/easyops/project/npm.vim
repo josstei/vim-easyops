@@ -1,4 +1,4 @@
-function! easyops#project#npm#GetOptions() abort
+function! easyops#project#npm#GetMenuOptions() abort
   let l:tasks = []
   let l:pkg   = findfile('package.json', '.;')
 

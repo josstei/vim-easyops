@@ -1,4 +1,4 @@
-function! easyops#project#maven#GetOptions() abort
+function! easyops#project#maven#GetMenuOptions() abort
   let l:tasks = []
   let l:pom = findfile('pom.xml', '.;')
 

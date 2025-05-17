@@ -37,29 +37,21 @@ endfunction
 
 function! easyops#menu#ProjectAndLangOptions() abort
   let l:opts = []
-  if exists('*easyops#project#maven#GetMenuOptions')
-    call extend(l:opts, easyops#project#maven#GetMenuOptions())
-  endif
-  if exists('*easyops#project#npm#GetMenuOptions')
-    call extend(l:opts, easyops#project#npm#GetMenuOptions())
-  endif
-  if exists('*easyops#project#cargo#GetMenuOptions')
-    call extend(l:opts, easyops#project#cargo#GetMenuOptions())
-  endif
 
-	echom 'filetype: ' . &filetype
+  for project in ['maven', 'npm', 'cargo']
+    try
+      let l:func = 'easyops#project#' . project. '#GetMenuOptions'
+      call extend(l:opts, call(l:func, []))
+    catch /.*/
+    endtry
+  endfor
 
-  if &filetype ==# 'java' && exists('*easyops#lang#java#GetMenuOptions')
-    call extend(l:opts, easyops#lang#java#GetMenuOptions())
-  endif
-  if &filetype ==# 'javascript' && exists('*easyops#lang#javascript#GetMenuOptions')
-    call extend(l:opts, easyops#lang#javascript#GetMenuOptions())
-  endif
-  if &filetype ==# 'rust' && exists('*easyops#lang#rust#GetMenuOptions')
-    call extend(l:opts, easyops#lang#rust#GetMenuOptions())
-  endif
-  if &filetype ==# 'vim'
-    call extend(l:opts, easyops#lang#vim#GetMenuOptions())
-  endif
+  try
+    let l:lang_func = 'easyops#lang#' . &filetype . '#GetMenuOptions'
+    call extend(l:opts, call(l:lang_func, []))
+  catch /.*/
+  endtry
+
   return l:opts
 endfunction
+

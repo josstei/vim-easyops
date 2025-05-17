@@ -1,4 +1,4 @@
-function! easyops#project#cargo#GetOptions() abort
+function! easyops#project#cargo#GetMenuOptions() abort
   let l:tasks      = []
   let l:cargo_file = findfile('Cargo.toml', '.;')
 

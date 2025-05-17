@@ -38,7 +38,7 @@ function! easyops#Execute(winid,idx) abort
   let l:full_cmd = printf('%s %s "%s"', l:shell, l:flag, l:cmd_esc)
 
 	execute 'belowright terminal ++close ' . l:full_cmd
-  execute 'file ' . string(l:cmd)
+  execute 'file ' . string(l:base)
 
   if exists('+term_finish_cmd')
     setlocal term_finish_cmd=close

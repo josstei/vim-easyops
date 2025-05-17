@@ -1,4 +1,3 @@
-
 function! easyops#menu#window#GetMenuOptions() abort
 	let l:tasks = []
 

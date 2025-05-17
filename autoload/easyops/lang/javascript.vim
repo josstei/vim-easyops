@@ -1,12 +1,14 @@
 function! easyops#lang#javascript#GetMenuOptions() abort
-	let l:tasks = []
-	let l:pkg = findfile('package.json', '.;')
-	
-	call add(l:tasks, ['Lint with ESLint', 'npm run lint'])
-	call add(l:tasks, ['Run Tests', 'npm test'])
-	call add(l:tasks, ['Start Dev Server', 'npm start'])
-	call add(l:tasks, ['Build for Production', 'npm run build'])
+  let l:tasks = []
 
-	return l:tasks
+  if !empty(findfile('package.json', '.;'))
+    call extend(l:tasks, easyops#project#npm#GetOptions())
+  endif
+
+  if empty(l:tasks)
+    let l:file = expand('%:p')
+    call add(l:tasks, ['Node: Run Current File', 'node ' . shellescape(l:file)])
+  endif
+
+  return l:tasks
 endfunction
-

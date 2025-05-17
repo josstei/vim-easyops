@@ -6,7 +6,7 @@ function! easyops#menu#ShowCategories() abort
         \ 'Code ▶',
         \ ]
 	call popup_menu(l:categories, {
-        \ 'title': 'EasyOps Categories',
+        \ 'title': ' EasyOps ',
         \ 'callback': 'easyops#menu#HandleCategorySelection',
         \ })
 endfunction
@@ -20,10 +20,10 @@ function! easyops#menu#HandleCategorySelection(id, result) abort
   let l:choice = l:categories[a:result - 1]
 
 	let s:categoryCommands = {
-        \ 'Git':    {'func': 'easyops#menu#git#GetMenuOptions',       'title': 'Git Commands'},
-        \ 'Window': {'func': 'easyops#menu#window#GetMenuOptions',    'title': 'Window Commands'},
-        \ 'File':   {'func': 'easyops#menu#file#GetMenuOptions',      'title': 'File Commands'},
-        \ 'Code':   {'func': 'easyops#menu#ProjectAndLangOptions',    'title': 'Code Commands'},
+        \ 'Git':    {'func': 'easyops#menu#git#GetMenuOptions',       'title': ' Git '},
+        \ 'Window': {'func': 'easyops#menu#window#GetMenuOptions',    'title': ' Window '},
+        \ 'File':   {'func': 'easyops#menu#file#GetMenuOptions',      'title': ' File '},
+        \ 'Code':   {'func': 'easyops#menu#ProjectAndLangOptions',    'title': ' Code '},
         \ }
 
 	if has_key(s:categoryCommands, l:choice)

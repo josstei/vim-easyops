@@ -10,6 +10,7 @@ function! easyops#menu#git#GetMenuOptions() abort
 	call add(l:tasks, ['Git: Fetch',     		'git fetch'])
 	call add(l:tasks, ['Git: Branches',     'git branch -a'])
 	call add(l:tasks, ['Git: Checkout...',  'git checkout '])
+
 	return l:tasks
 endfunction
 

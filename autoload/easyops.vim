@@ -4,20 +4,6 @@ endif
 
 let g:loaded_easyops_core = 1
 
-function! easyops#LoadConfig(root) abort
-  let l:cfg = {}
-  let l:file = a:root . '/.easyops.json'
-
-  if filereadable(l:file)
-    try
-      let l:cfg = json_decode(join(readfile(l:file), "\n"))
-    catch
-    endtry
-  endif
-
-  return l:cfg
-endfunction
-
 function! easyops#Execute(winid,idx) abort
   if a:idx <= 0 | return | endif
 

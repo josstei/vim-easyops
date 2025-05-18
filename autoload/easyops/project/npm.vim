@@ -8,8 +8,9 @@ function! easyops#project#npm#GetMenuOptions() abort
 
   let l:root     = fnamemodify(l:pkg, ':p:h')
   let l:cd       = 'cd ' . shellescape(l:root) . ' && '
-  let l:config   = easyops#LoadConfig(l:root)
-  let l:npm_opts = get(l:config, 'npm_opts', '')
+	let l:config   = easyops#project#LoadConfig(l:root)
+	let l:npm_conf = get(l:config, 'npm', {})
+	let l:npm_opts = get(l:npm_conf, 'npm_opts', '')
 
   call add(l:tasks, ['npm: Install', l:cd . 'npm ' . l:npm_opts . ' install'])
   call add(l:tasks, ['npm: Build',   l:cd . 'npm ' . l:npm_opts . ' run build'])

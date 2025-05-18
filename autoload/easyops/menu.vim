@@ -5,10 +5,16 @@ function! easyops#menu#ShowCategories() abort
         \ 'File ▶',
         \ 'Code ▶',
         \ ]
+
+  if !filereadable(getcwd() . '/.easyops.json')
+    call add(l:categories, 'Create EasyOps Config')
+  endif
+
 	call popup_menu(l:categories, {
         \ 'title': ' EasyOps ',
         \ 'callback': 'easyops#menu#HandleCategorySelection',
         \ })
+
 endfunction
 
 function! easyops#menu#HandleCategorySelection(id, result) abort
@@ -16,18 +22,22 @@ function! easyops#menu#HandleCategorySelection(id, result) abort
     return
   endif
 
-  let l:categories = ['Git', 'Window', 'File', 'Code']
-  let l:choice = l:categories[a:result - 1]
-
-	let s:categoryCommands = {
+	let l:categories     = ['Git', 'Window', 'File', 'Code','Create EasyOps Config']
+	let l:choice         = l:categories[a:result - 1]
+	let s:menuOptionsMap = {
         \ 'Git':    {'func': 'easyops#menu#git#GetMenuOptions',       'title': ' Git '},
         \ 'Window': {'func': 'easyops#menu#window#GetMenuOptions',    'title': ' Window '},
         \ 'File':   {'func': 'easyops#menu#file#GetMenuOptions',      'title': ' File '},
         \ 'Code':   {'func': 'easyops#menu#ProjectAndLangOptions',    'title': ' Code '},
         \ }
 
-	if has_key(s:categoryCommands, l:choice)
-		let l:info = s:categoryCommands[l:choice]
+  if l:choice ==# 'Create EasyOps Config'
+    call easyops#menu#CreateConfigFile()
+    return
+  endif
+
+	if has_key(s:menuOptionsMap, l:choice)
+		let l:info = s:menuOptionsMap[l:choice]
     let l:opts = call(l:info.func, [])
 		let g:easyops_cmds = map(copy(l:opts), 'v:val[1]')
   	let l:labels = map(l:opts, {_, v -> v[0]})
@@ -55,3 +65,16 @@ function! easyops#menu#ProjectAndLangOptions() abort
   return l:opts
 endfunction
 
+function! easyops#menu#CreateConfigFile() abort
+  let l:path = getcwd() . '/.easyops.json'
+
+  if filereadable(l:path)
+    echom 'EasyOps Config already exists at ' . l:path
+    return
+  endif
+
+  let l:default_config = { "environment": {}}
+
+  call writefile([json_encode(l:default_config)], l:path)
+  echom 'EasyOps Config created at ' . l:path
+endfunction

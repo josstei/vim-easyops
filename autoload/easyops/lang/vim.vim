@@ -1,6 +1,6 @@
 function! easyops#lang#vim#GetMenuOptions() abort
     let l:tasks = []
-    let l:file = expand('%:p')
+    let l:file  = expand('%:p')
 
     call add(l:tasks, ['Source Current File', ':source %'])
     call add(l:tasks, ['Reload Vim Config',   ':source ' . expand('$MYVIMRC')])

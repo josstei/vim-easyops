@@ -1,0 +1,26 @@
+function! easyops#project#InitConfig(root, cfg, project_type, defaults) abort
+  let l:file = a:root . '/.easyops.json'
+
+	if !has_key(a:cfg, a:project_type)
+    let a:cfg[a:project_type] = a:defaults
+
+    call writefile([json_encode(a:cfg)], l:file)
+    echom 'EasyOps: ' . a:project_type . ' config initialized in ' . l:file
+  else
+    echom 'EasyOps: ' . a:project_type . ' config already exists.'
+  endif
+endfunction
+
+function! easyops#project#LoadConfig(root) abort
+  let l:cfg = {}
+  let l:file = a:root . '/.easyops.json'
+
+  if filereadable(l:file)
+    try
+      let l:cfg = json_decode(join(readfile(l:file), "\n"))
+    catch
+    endtry
+  endif
+
+  return l:cfg
+endfunction

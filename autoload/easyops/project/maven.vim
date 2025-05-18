@@ -1,3 +1,13 @@
+let g:easyops_maven_commands = {
+      \ 'Maven: Clean':    'clean',
+      \ 'Maven: Compile':  'compile',
+      \ 'Maven: Test':     'test',
+      \ 'Maven: Package':  'package',
+      \ 'Maven: Install':  'install',
+      \ 'Maven: Verify':   'verify',
+      \ 'Maven: Deploy':   'deploy'
+      \ }
+
 function! easyops#project#maven#GetMenuOptions() abort
   let l:tasks = []
   let l:pom   = findfile('pom.xml', '.;')
@@ -17,13 +27,9 @@ function! easyops#project#maven#GetMenuOptions() abort
 		return l:tasks
   endif
 
-  call add(l:tasks, ['Maven: Clean',    l:cd . 'mvn ' . l:mvn_opts . ' clean'])
-  call add(l:tasks, ['Maven: Compile',  l:cd . 'mvn ' . l:mvn_opts . ' compile'])
-  call add(l:tasks, ['Maven: Test',     l:cd . 'mvn ' . l:mvn_opts . ' test'])
-  call add(l:tasks, ['Maven: Package',  l:cd . 'mvn ' . l:mvn_opts . ' package'])
-  call add(l:tasks, ['Maven: Install',  l:cd . 'mvn ' . l:mvn_opts . ' install'])
-  call add(l:tasks, ['Maven: Verify',   l:cd . 'mvn ' . l:mvn_opts . ' verify'])
-  call add(l:tasks, ['Maven: Deploy',   l:cd . 'mvn ' . l:mvn_opts . ' deploy'])
+	for [l:label, l:cmd] in items(g:easyops_maven_commands)
+		call add(l:tasks, [l:label, l:cd . 'mvn ' . l:mvn_opts . ' ' . l:cmd])
+	endfor
 
   return l:tasks
 endfunction

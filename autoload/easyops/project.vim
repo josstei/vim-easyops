@@ -24,3 +24,17 @@ function! easyops#project#LoadConfig(root) abort
 
   return l:cfg
 endfunction
+
+function! easyops#project#CreateConfigFile() abort
+  let l:path = getcwd() . '/.easyops.json'
+
+  if filereadable(l:path)
+    echom 'EasyOps Config already exists at ' . l:path
+    return
+  endif
+
+  let l:default_config = { "environment": {}}
+
+  call writefile([json_encode(l:default_config)], l:path)
+  echom 'EasyOps Config created at ' . l:path
+endfunction

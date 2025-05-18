@@ -32,7 +32,7 @@ function! easyops#menu#HandleCategorySelection(id, result) abort
         \ }
 
   if l:choice ==# 'Create EasyOps Config'
-    call easyops#menu#CreateConfigFile()
+    call easyops#project#CreateConfigFile()
     return
   endif
 
@@ -63,18 +63,4 @@ function! easyops#menu#ProjectAndLangOptions() abort
   endtry
 
   return l:opts
-endfunction
-
-function! easyops#menu#CreateConfigFile() abort
-  let l:path = getcwd() . '/.easyops.json'
-
-  if filereadable(l:path)
-    echom 'EasyOps Config already exists at ' . l:path
-    return
-  endif
-
-  let l:default_config = { "environment": {}}
-
-  call writefile([json_encode(l:default_config)], l:path)
-  echom 'EasyOps Config created at ' . l:path
 endfunction

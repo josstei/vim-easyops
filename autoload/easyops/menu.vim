@@ -49,8 +49,9 @@ function! easyops#menu#ProjectAndLangOptions() abort
 
   for project in ['maven', 'npm', 'cargo','bundler']
     try
-      let l:func = 'easyops#project#' . project. '#GetMenuOptions'
-      call extend(l:opts, call(l:func, []))
+			let l:config  = easyops#project#GetProjectMenuConfig(project)
+			let l:options = easyops#project#GetProjectMenuOptions(project, l:config)
+			call extend(l:opts,l:options)
     catch /.*/
     endtry
   endfor
@@ -62,28 +63,4 @@ function! easyops#menu#ProjectAndLangOptions() abort
   endtry
 
   return l:opts
-endfunction
-
-function! easyops#menu#GetProjectOptions(manifest,type,bin,options) abort
-	let l:tasks    = []
-	let l:manifest = findfile(a:manifest,'.;')
-
-	if empty(l:manifest)
-		return l:tasks
-	endif
-
-	let l:root        = fnamemodify(l:manifest,':p:h')
-	let l:cd          = 'cd ' . shellescape(l:root) . ' && '
-	let l:confFile    = easyops#config#LoadConfig(l:root)
-	let l:projectConf = get(l:confFile,a:type,{}) 
-	let l:flags       = get(l:projectConf,a:type.'_opts','')
-	
-	if empty(l:projectConf)
-	endif
-
-	for [l:label,l:cmd] in items(a:options)
-		call add(l:tasks,[l:label, l:cd . a:bin . ' ' . l:flags . ' ' . l:cmd])
-	endfor
-	
-	return l:tasks
 endfunction

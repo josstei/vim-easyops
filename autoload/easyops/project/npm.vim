@@ -1,21 +1,10 @@
+let g:easyops_npm_commands = {
+      \ 'npm: Install': 'install',
+      \ 'npm: Build':   'run build',
+      \ 'npm: Test':    'test',
+      \ 'npm: Start':   'start'
+      \ }
+
 function! easyops#project#npm#GetMenuOptions() abort
-  let l:tasks = []
-  let l:pkg   = findfile('package.json', '.;')
-
-  if empty(l:pkg)
-    return l:tasks
-  endif
-
-  let l:root     = fnamemodify(l:pkg, ':p:h')
-  let l:cd       = 'cd ' . shellescape(l:root) . ' && '
-	let l:config   = easyops#project#LoadConfig(l:root)
-	let l:npm_conf = get(l:config, 'npm', {})
-	let l:npm_opts = get(l:npm_conf, 'npm_opts', '')
-
-  call add(l:tasks, ['npm: Install', l:cd . 'npm ' . l:npm_opts . ' install'])
-  call add(l:tasks, ['npm: Build',   l:cd . 'npm ' . l:npm_opts . ' run build'])
-  call add(l:tasks, ['npm: Test',    l:cd . 'npm ' . l:npm_opts . ' test'])
-  call add(l:tasks, ['npm: Start',   l:cd . 'npm ' . l:npm_opts . ' start'])
-
-  return l:tasks
+	return easyops#menu#GetProjectOptions('package.json','npm','npm',g:easyops_npm_commands)
 endfunction

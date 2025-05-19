@@ -14,7 +14,6 @@ function! easyops#menu#ShowCategories() abort
         \ 'title': ' EasyOps ',
         \ 'callback': 'easyops#menu#HandleCategorySelection',
         \ })
-
 endfunction
 
 function! easyops#menu#HandleCategorySelection(id, result) abort
@@ -32,7 +31,7 @@ function! easyops#menu#HandleCategorySelection(id, result) abort
         \ }
 
   if l:choice ==# 'Create EasyOps Config'
-    call easyops#project#CreateConfigFile()
+    call easyops#config#CreateConfigFile()
     return
   endif
 
@@ -75,7 +74,7 @@ function! easyops#menu#GetProjectOptions(manifest,type,bin,options) abort
 
 	let l:root        = fnamemodify(l:manifest,':p:h')
 	let l:cd          = 'cd ' . shellescape(l:root) . ' && '
-	let l:confFile    = easyops#project#LoadConfig(l:root)
+	let l:confFile    = easyops#config#LoadConfig(l:root)
 	let l:projectConf = get(l:confFile,a:type,{}) 
 	let l:flags       = get(l:projectConf,a:type.'_opts','')
 	

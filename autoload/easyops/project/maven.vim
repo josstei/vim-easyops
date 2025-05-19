@@ -13,6 +13,6 @@ function! easyops#project#maven#GetMenuOptions() abort
 endfunction
 
 function! easyops#project#maven#InitConfig(root,cfg) abort
-  call easyops#project#InitConfig(a:root, a:cfg, 'maven', {'maven_opts': '-DskipTests'})
+  call easyops#config#InitConfig(a:root, a:cfg, 'maven', {'maven_opts': '-DskipTests'})
 endfunction
 

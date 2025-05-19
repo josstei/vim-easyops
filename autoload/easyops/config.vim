@@ -1,4 +1,4 @@
-function! easyops#project#InitConfig(root, cfg, project_type, defaults) abort
+function! easyops#config#InitConfig(root, cfg, project_type, defaults) abort
   let l:file = a:root . '/.easyops.json'
 
 	if !has_key(a:cfg, a:project_type)
@@ -11,7 +11,7 @@ function! easyops#project#InitConfig(root, cfg, project_type, defaults) abort
   endif
 endfunction
 
-function! easyops#project#LoadConfig(root) abort
+function! easyops#config#LoadConfig(root) abort
   let l:cfg = {}
   let l:file = a:root . '/.easyops.json'
 
@@ -25,7 +25,7 @@ function! easyops#project#LoadConfig(root) abort
   return l:cfg
 endfunction
 
-function! easyops#project#CreateConfigFile() abort
+function! easyops#config#CreateConfigFile() abort
   let l:path = getcwd() . '/.easyops.json'
 
   if filereadable(l:path)

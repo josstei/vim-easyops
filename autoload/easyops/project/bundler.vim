@@ -16,5 +16,5 @@ function! easyops#project#bundler#GetMenuOptions() abort
 endfunction
 
 function! easyops#project#bundler#InitConfig(root,cfg) abort
-  call easyops#project#InitConfig(a:root, a:cfg, 'bundler', {'bundler_opts': '-DskipTests'})
+  call easyops#config#InitConfig(a:root, a:cfg, 'bundler', {'bundler_opts': '-DskipTests'})
 endfunction

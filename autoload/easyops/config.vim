@@ -1,8 +1,9 @@
-function! easyops#config#InitConfig(root, cfg, project_type, defaults) abort
-  let l:file = a:root . '/.easyops.json'
+function! easyops#config#InitConfig(root,type,config) abort
+  let l:file    = a:root . '/.easyops.json'
+	let l:default = a:config.default
 
 	if !has_key(a:cfg, a:project_type)
-    let a:cfg[a:project_type] = a:defaults
+    let a:cfg[a:type] = a:defaults
 
     call writefile([json_encode(a:cfg)], l:file)
     echom 'EasyOps: ' . a:project_type . ' config initialized in ' . l:file

@@ -1,14 +1,14 @@
-function! easyops#lang#javascript#GetMenuOptions() abort
-  let l:tasks = []
-
-  if !empty(findfile('package.json', '.;'))
-    call extend(l:tasks, easyops#project#npm#GetOptions())
+function! easyops#lang#javascript#config() abort
+  if !exists('g:easyops_commands_javascript')
+		let l:file = expand('%:p')
+		let g:easyops_commands_javascript = {
+					\		'Node: Compile': 'node ' . shellescape(l:file)
+					\	}
   endif
 
-  if empty(l:tasks)
-    let l:file = expand('%:p')
-    call add(l:tasks, ['Node: Run Current File', 'node ' . shellescape(l:file)])
+  if !exists('g:easyops_config_javascript')
+    let g:easyops_config_javascript = { 'commands' : g:easyops_commands_java }
   endif
 
-  return l:tasks
+  return g:easyops_config_javascript
 endfunction

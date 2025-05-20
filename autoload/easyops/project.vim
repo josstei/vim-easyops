@@ -15,13 +15,10 @@ function! easyops#project#GetProjectMenuOptions(type,config) abort
 	let l:projectConf = get(l:confFile,a:type,{}) 
 	let l:flags       = get(l:projectConf,a:type.'_opts','')
 	
-	if empty(l:projectConf)
-	endif
-
-"   if empty(l:projectConf)
-" "     call add(l:tasks, ['Init EasyOps', printf(':call easyops#config#InitConfig(%s,%s)', string(l:root), l:defaultConf)])
+  if empty(l:projectConf)
+"     call add(l:tasks, ['Init EasyOps', printf(':call easyops#config#InitConfig(%s,%s,%s)', string(l:root), a:type, l:projectConf)])
 " 		return l:tasks
-"   endif
+  endif
 
 	for [l:label,l:cmd] in items(l:commands)
 		call add(l:tasks,[l:label, l:cd . l:cli. ' ' . l:flags . ' ' . l:cmd])

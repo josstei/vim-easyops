@@ -1,9 +1,15 @@
-function! easyops#lang#rust#GetMenuOptions() abort
-	let l:tasks = []
-	let l:file  = expand('%:p')
+function! easyops#lang#rust#config() abort
+  if !exists('g:easyops_commands_rust')
+		let l:file = expand('%:p')
+		let g:easyops_commands_rust = {
+					\ 'Rust: Compile': 'rustc ' . shellescape(l:file),
+					\ 'Rust: Run':     'rustc ' . shellescape(l:file) . ' && ./' . expand('%:t:r')
+					\	}
+  endif
 
-	call add(l:tasks, ['Compile Current File',  'rustc ' . shellescape(l:file)])
-	call add(l:tasks, ['Run Current Executable', 'rustc ' . shellescape(l:file) . ' && ./' . expand('%:t:r')])
+  if !exists('g:easyops_config_rust')
+    let g:easyops_config_rust = { 'commands' : g:easyops_commands_rust }
+  endif
 
-  return l:tasks
+  return g:easyops_config_rust
 endfunction

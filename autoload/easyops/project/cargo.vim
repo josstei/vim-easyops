@@ -5,12 +5,12 @@ function! easyops#project#cargo#config() abort
           \ 'cli'      : 'cargo',
           \ 'default'  : {'cargo_opts': ''},
           \ 'commands' : {
-          \   'Cargo: Build': 'clean',
-          \   'Cargo: Test': 'compile',
-          \   'Cargo: Run': 'test',
-          \   'Cargo: Check': 'package',
-          \   'Cargo: Clean': 'install'
-          \ }
+          \			'Cargo: Build': 'build',
+          \			'Cargo: Test': 'test',
+          \			'Cargo: Run': 'run',
+          \			'Cargo: Check': 'check',
+          \			'Cargo: Clean': 'clean'
+          \		}
     			\ }
   endif
   return g:easyops_config_cargo

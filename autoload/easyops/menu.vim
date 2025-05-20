@@ -56,11 +56,11 @@ function! easyops#menu#ProjectAndLangOptions() abort
     endtry
   endfor
 
-  try
-    let l:lang_func = 'easyops#lang#' . &filetype . '#GetMenuOptions'
-    call extend(l:opts, call(l:lang_func, []))
-  catch /.*/
-  endtry
+	try
+    let l:ftOptions = easyops#command#GetFileTypeOptions(&filetype)
+    call extend(l:opts, l:ftOptions)
+	catch /.*/
+	endtry
 
   return l:opts
 endfunction

@@ -1,17 +1,22 @@
-function! easyops#lang#java#GetMenuOptions() abort
-  let l:tasks = []
-  let l:file  = expand('%:p')
+function! easyops#lang#java#config() abort
+  if !exists('g:easyops_commands_java')
+		let g:easyops_commands_java = {
+					\		'Java: Compile':         'javac -d target/classes ' . expand('%'),
+					\		'Java: Compile Project': 'javac -d target/classes $(find src/main/java -name "*.java")',
+					\		'Java: Run':             'java -cp target/classes ' . GetMainClass()
+					\	}
+  endif
 
-	call add(l:tasks, ['Java: Compile', 'javac -d target/classes ' . expand('%')])
-	call add(l:tasks, ['Java: Compile Project', 'javac -d target/classes $(find src/main/java -name "*.java")'])
-	call add(l:tasks, ['Java: Run (java)', 'java -cp target/classes ' . GetMainClass()])
+  if !exists('g:easyops_config_java')
+    let g:easyops_config_java = { 'commands' : g:easyops_commands_java }
+  endif
 
-  return l:tasks
+  return g:easyops_config_java
 endfunction
 
 function! GetMainClass()
   let l:lines = readfile(expand('%'))
-  let l:pkg = ''
+  let l:pkg   = ''
 
   for line in l:lines
     if line =~? '^package '

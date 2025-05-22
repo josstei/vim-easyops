@@ -1,20 +1,22 @@
 function! easyops#config#InitConfig(root,type,config) abort
-  let l:file    = a:root . '/.easyops.json'
+  let l:file    = easyops#config#GetConfig(root) abort
 	let l:default = a:config.default
 
 	if !has_key(a:cfg, a:project_type)
     let a:cfg[a:type] = a:defaults
+    let l:configState = 'config initialized in ' . l:file
 
     call writefile([json_encode(a:cfg)], l:file)
-    echom 'EasyOps: ' . a:project_type . ' config initialized in ' . l:file
   else
-    echom 'EasyOps: ' . a:project_type . ' config already exists.'
+    let l:configState = 'config already exists'
   endif
+
+  echom 'EasyOps: ' . a:project_type . ' ' .l:configState
 endfunction
 
 function! easyops#config#LoadConfig(root) abort
-  let l:cfg = {}
-  let l:file = a:root . '/.easyops.json'
+  let l:cfg  = {}
+  let l:file = easyops#config#GetConfig(a:root) 
 
   if filereadable(l:file)
     try
@@ -26,16 +28,6 @@ function! easyops#config#LoadConfig(root) abort
   return l:cfg
 endfunction
 
-function! easyops#config#CreateConfigFile() abort
-  let l:path = getcwd() . '/.easyops.json'
-
-  if filereadable(l:path)
-    echom 'EasyOps Config already exists at ' . l:path
-    return
-  endif
-
-  let l:default_config = { "environment": {}}
-
-  call writefile([json_encode(l:default_config)], l:path)
-  echom 'EasyOps Config created at ' . l:path
+function! easyops#config#GetConfig(root) abort
+  return a:root . '/.easyops.json'
 endfunction

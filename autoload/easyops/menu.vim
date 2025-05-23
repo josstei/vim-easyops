@@ -1,44 +1,76 @@
-let s:main_menu_options = ['Git', 'Window', 'File', 'Code']
-let s:main_menu = {}
+let g:easyops_menu_main = ['Git','File','Window','Code']
+let s:main_menu         = {}
+let s:menuOptions       = []
+let s:popup_settings = {
+  \ 'title': 'EasyOps',
+  \ 'padding': [0,1,0,1],
+  \ 'border': [],
+  \ 'pos': 'center',
+  \ 'zindex': 300,
+  \ 'minwidth': max(map(copy(s:menuOptions), 'len(v:val)')) + 2,
+  \ 'mapping': 0,
+  \ 'drag': 0
+  \ }
 
-for key in s:main_menu_options
+for key in g:easyops_menu_main
   let s:main_menu[key] = {
-        \ 'func': key ==# 'Code' ? 'easyops#menu#ProjectAndLangOptions' : 'easyops#menu#' . tolower(key) . '#GetMenuOptions',
-        \ 'title': ' ' . key . ' '
+        \ 'func'  : key ==# 'Code' ? 'easyops#menu#ProjectAndLangOptions' : 'easyops#menu#' . tolower(key) . '#GetMenuOptions',
+        \ 'title' : ' ' . key . ' '
         \ }
 endfor
 
-function! easyops#menu#ShowCategories() abort
-  call popup_menu(s:main_menu_options, { 'title': ' EasyOps', 'callback': 'easyops#menu#HandleCategorySelection' })
+function! s:createPopupMenu(lines, title) abort
+  let popup_id = popup_create(a:lines, s:popup_settings)
+  redraw!
+  call popup_close(popup_id)
+  return nr2char(getchar())
 endfunction
 
-function! easyops#menu#HandleCategorySelection(id, result) abort
-  if a:result < 1 | return | endif
+function! easyops#menu#InteractiveMenu(options,title) abort
+" 	try
+		let l:hotkeys      = {}
+		let l:menu_options = type(a:options) == type([]) ? copy(a:options) : []
 
-  let l:choice = s:main_menu_options[a:result - 1]
-  let l:info   = s:main_menu[l:choice]
-  let l:opts   = call(l:info.func, [])
-
-  let g:easyops_cmds     = map(copy(l:opts), 'v:val[1]')
-  let l:sub_menu_options = map(copy(l:opts), 'v:val[0]')
-
-  call popup_menu(l:sub_menu_options, { 'title': l:info.title, 'callback': 'easyops#Execute' })
+		for i in range(len(l:menu_options))
+			let l:key             = string(i + 1)
+			let l:hotkeys[key]    = l:menu_options[i]
+			let l:menu_options[i] = l:key . ': ' . l:hotkeys[l:key] 
+		endfor
+		
+		let l:choice = s:createPopupMenu(l:menu_options, ' ' . a:title . ' ')
+		return has_key(l:hotkeys, l:choice) ? l:hotkeys[l:choice] : ''
+"   catch /.*/
+" 		echo 'EasyOps: No actions available'
+" 		return
+" 	endtry
 endfunction
 
+function! easyops#menu#ShowMainMenu() abort
+  let choice = easyops#menu#InteractiveMenu(g:easyops_menu_main, 'EasyOps')
+  call easyops#menu#ShowSubMenu(call(s:main_menu[choice].func,[]))
+endfunction
+
+function! easyops#menu#ShowSubMenu(options) abort
+		let choice = easyops#menu#InteractiveMenu(a:options,'EasyOps')
+		call easyops#Execute(a:options[choice])
+endfunction
+
+" this needs to be cleaned up 
 function! easyops#menu#ProjectAndLangOptions() abort
-  let l:opts = []
+"   let opts = []
 
-  for project in ['maven', 'npm', 'cargo', 'bundler']
-    try
-      call extend(l:opts, easyops#command#GetProjectTypeOptions(project))
-    catch /.*/
-    endtry
-  endfor
+"   for project in ['maven', 'npm', 'cargo', 'bundler']
+"     try
+"       call extend(opts, easyops#command#GetProjectTypeOptions(project))
+"     catch /.*/
+"     endtry
+"   endfor
 
   try
-    call extend(l:opts, easyops#command#GetFileTypeOptions(&filetype))
+    return easyops#command#GetFileTypeOptions(&filetype)
   catch /.*/
   endtry
 
-  return l:opts
+"   return opts
 endfunction
+

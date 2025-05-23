@@ -9,9 +9,5 @@ function! easyops#lang#vim#config() abort
 					\	}
   endif
 
-  if !exists('g:easyops_config_vim')
-    let g:easyops_config_vim= { 'commands' : g:easyops_commands_vim}
-  endif
-
-  return g:easyops_config_vim
+	return { 'commands': g:easyops_commands_vim }
 endfunction

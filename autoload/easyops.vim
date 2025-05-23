@@ -4,13 +4,11 @@ endif
 
 let g:loaded_easyops_core = 1
 
-function! easyops#Execute(winid,idx) abort
-  if a:idx <= 0 | return | endif
+function! easyops#Execute(cmd) abort
 
-  let l:base = get(g:easyops_cmds, a:idx - 1, [])
-  let l:cmd  = l:base
-
-  if empty(l:cmd) | return | endif
+  let l:cmd  = a:cmd
+	
+  if empty(l:cmd) || l:cmd == '0'  | return | endif
 
 	if l:cmd[0] ==# ':'
 		execute l:cmd
@@ -24,7 +22,7 @@ function! easyops#Execute(winid,idx) abort
   let l:full_cmd = printf('%s %s "%s"', l:shell, l:flag, l:cmd_esc)
 
 	execute 'belowright terminal ++close ' . l:full_cmd
-  execute 'file ' . string(l:base)
+  execute 'file ' . string(l:cmd)
 
   if exists('+term_finish_cmd')
     setlocal term_finish_cmd=close

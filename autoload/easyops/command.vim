@@ -1,3 +1,4 @@
+" need to build ability for nested menus
 function! easyops#command#GetOptions(val) abort
 	return get(g:, 'easyops_commands_'.val,{})
 endfunction

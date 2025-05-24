@@ -1,4 +1,4 @@
-function! easyops#lang#java#config() abort
+function! easyops#command#java#commands() abort
   if !exists('g:easyops_commands_java')
 		let g:easyops_commands_java = [
 					\	{	'label': 'Java: Compile', 'command': 'javac -d target/classes ' . expand('%') },
@@ -6,8 +6,10 @@ function! easyops#lang#java#config() abort
 					\	{	'label': 'Java: Run', 'command': 'java -cp target/classes ' . GetMainClass() }
 					\	]
   endif
-
-  return { 'commands' : g:easyops_commands_java }
+  if !exists('g:easyops_menu_java')
+   let g:easyops_menu_java = { 'commands' : g:easyops_commands_java }
+	endif
+	return g:easyops_menu_java
 endfunction
 
 function! GetMainClass()

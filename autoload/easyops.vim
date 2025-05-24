@@ -4,25 +4,26 @@ endif
 
 let g:loaded_easyops_core = 1
 
-function! easyops#Execute(cmd) abort
+function! easyops#Execute(config) abort
 
-  let l:cmd  = a:cmd
+  let l:command = a:config.command
+  let l:label = a:config.command
 	
-  if empty(l:cmd) || l:cmd == '0'  | return | endif
+  if empty(l:command) || l:command == '0'  | return | endif
 
-	if l:cmd[0] ==# ':'
-		execute l:cmd
+	if l:command[0] ==# ':'
+		execute l:command
 		return
   endif
 
-	let l:cmd     .= ' ; echo "" ; echo "Press ENTER to close…" ; read'
+	let l:command .= ' ; echo "" ; echo "Press ENTER to close…" ; read'
   let l:shell    = &shell
   let l:flag     = &shellcmdflag
-  let l:cmd_esc  = substitute(l:cmd, '"', '\\"', 'g')
+  let l:cmd_esc  = substitute(l:command, '"', '\\"', 'g')
   let l:full_cmd = printf('%s %s "%s"', l:shell, l:flag, l:cmd_esc)
 
 	execute 'belowright terminal ++close ' . l:full_cmd
-  execute 'file ' . string(l:cmd)
+  execute 'file ' . string(l:label)
 
   if exists('+term_finish_cmd')
     setlocal term_finish_cmd=close

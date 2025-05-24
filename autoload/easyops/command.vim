@@ -3,6 +3,10 @@ function! easyops#command#GetFileTypeOptions(filetype) abort
 	return l:config.commands
 endfunction
 
+function! easyops#command#GetOptions(val) abort
+	return get(g:, 'easyops_commands_'.val,{})
+endfunction
+
 function! easyops#command#GetProjectTypeOptions(type) abort
 	let l:tasks    = []
 	let l:config   = easyops#command#GetConfig('project', a:type)
@@ -14,6 +18,16 @@ function! easyops#command#GetProjectTypeOptions(type) abort
 	endfor
 	
 	return l:tasks
+endfunction
+
+function! easyops#command#GetCommands(val) abort
+	let l:loader = 'easyops#command#' . tolower(a:val) . '#commands'
+  try
+    let Fn = function(l:loader)
+    return call(Fn, [])
+  catch /.*/ 
+    return {}
+  endtry
 endfunction
 
 function! easyops#command#GetConfig(configType,configOption) abort

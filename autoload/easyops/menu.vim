@@ -1,9 +1,11 @@
-let g:easyops_menu_main = [
-			\ { 'label' : 'Git' }, 
+let g:easyops_menu_commands = [
+			\ { 'label' : 'Git' , 'command': 'echo WHAT THE FUCK'}, 
 			\ { 'label' : 'File' }, 
 			\ { 'label' : 'Window' }, 
 			\ { 'label' : 'Code' } 
 			\	]
+
+let g:easyops_menu_main = { 'commands' : g:easyops_menu_commands }
 
 let s:popup_settings = {
   \ 'title': 'EasyOps',
@@ -17,6 +19,7 @@ let s:popup_settings = {
   \ }
 
 function! s:createPopupMenu(lines, title) abort
+	let s:popup_settings['title'] = a:title
   let popup_id = popup_create(a:lines, s:popup_settings)
   redraw!
   call popup_close(popup_id)
@@ -25,26 +28,34 @@ endfunction
 
 function! easyops#menu#InteractiveMenu(config,title) abort
 	try
-		let l:hotkeys = {}
-		let l:options = []
+		let l:hotkeys  = {}
+		let l:options  = []
+		let l:commands = a:config.commands
 
-		for i in range(len(a:config))
-			let l:key = string(i + 1)
-			let l:hotkeys[key] = a:config[i].label
+		for i in range(len(l:commands))
+			let l:key          = string(i + 1 )
+			let l:hotkeys[key] = l:commands[i].label
+
 			call add(l:options, l:key . ': ' . l:hotkeys[l:key])
 		endfor
 		
-		let l:choice   = s:createPopupMenu(l:options, ' ' . a:title . ' ')
+		let l:choice = s:createPopupMenu(l:options, ' ' . a:title . ' ')
 
-		if has_key(l:hotkeys, l:choice) 
-			let l:test = easyops#command#GetCommands(l:hotkeys[l:choice])
-			if type(l:test) == type({}) && has_key(l:test, 'commands') && type(l:test.commands) == type([]) && !empty(l:test.commands)
-				call easyops#menu#InteractiveMenu(l:test.commands, 'EasyOps')
-			else
-				call easyops#Execute(a:config[l:choice - 1])
-			endif
-		else
-			return ''
+		if !has_key(l:hotkeys, l:choice) 
+			echo 'EasyOps: Not a valid selection'
+			return
+		endif 
+
+		let l:selection = l:commands[l:choice - 1]
+
+		if has_key(l:selection,'command')
+			call easyops#Execute(l:selection)
+			return
+		endif
+
+		let l:sub_menu_commands = easyops#command#GetCommands(l:selection.label)
+		if !empty(l:sub_menu_commands) 
+				call easyops#menu#InteractiveMenu(l:sub_menu_commands,l:selection.label)
 		endif
   catch /.*/
 		echo 'EasyOps: No actions available'
@@ -53,32 +64,5 @@ function! easyops#menu#InteractiveMenu(config,title) abort
 endfunction
 
 function! easyops#menu#ShowMainMenu() abort
-  call easyops#menu#InteractiveMenu(g:easyops_menu_main, 'EasyOps - Main')
-endfunction
-
-" this needs to be cleaned up 
-function! easyops#menu#ProjectAndLangOptions() abort
-"   let opts = []
-
-"   for project in ['maven', 'npm', 'cargo', 'bundler']
-"     try
-"       call extend(opts, easyops#command#GetProjectTypeOptions(project))
-"     catch /.*/
-"     endtry
-"   endfor
-
-  try
-    return easyops#command#GetFileTypeOptions(&filetype)
-  catch /.*/
-  endtry
-
-"   return opts
-endfunction
-
-function! easyops#menu#GetOptions(val) abort
-  try
-    return easyops#command#GetOptions(val)
-  catch /.*/
-  endtry
-"   return opts
+  call easyops#menu#InteractiveMenu(g:easyops_menu_main, 'EasyOps')
 endfunction

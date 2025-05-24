@@ -1,8 +1,3 @@
-function! easyops#command#GetFileTypeOptions(filetype) abort
-	let l:config = easyops#command#GetConfig('lang', a:filetype)
-	return l:config.commands
-endfunction
-
 function! easyops#command#GetOptions(val) abort
 	return get(g:, 'easyops_commands_'.val,{})
 endfunction

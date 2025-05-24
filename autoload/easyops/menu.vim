@@ -1,5 +1,5 @@
 let g:easyops_menu_commands = [
-			\ { 'label' : 'Git' , 'command': 'echo WHAT THE FUCK'}, 
+			\ { 'label' : 'Git' }, 
 			\ { 'label' : 'File' }, 
 			\ { 'label' : 'Window' }, 
 			\ { 'label' : 'Code' } 

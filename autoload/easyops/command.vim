@@ -25,16 +25,6 @@ function! easyops#command#GetCommands(val) abort
   endtry
 endfunction
 
-function! easyops#command#GetConfig(configType,configOption) abort
-	let l:loader = 'easyops#' . a:configType . '#' . a:configOption . '#config'
-  try
-    let Fn = function(l:loader)
-    return call(Fn, [])
-  catch /.*/ 
-    return {}
-  endtry
-endfunction
-
 function! easyops#command#ProjectCommand(config) abort
 	let l:manifest    = findfile(a:config['manifest'],'.;')
 	let l:cli         = a:config.cli

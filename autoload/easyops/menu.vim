@@ -1,12 +1,3 @@
-let g:easyops_menu_commands = [
-			\ { 'label' : 'Git' }, 
-			\ { 'label' : 'File' }, 
-			\ { 'label' : 'Window' }, 
-			\ { 'label' : 'Code' } 
-			\	]
-
-let g:easyops_menu_main = { 'commands' : g:easyops_menu_commands }
-
 let s:popup_settings = {
   \ 'title': 'EasyOps',
   \ 'padding': [0,1,0,1],
@@ -30,7 +21,7 @@ function! easyops#menu#InteractiveMenu(config,title) abort
 	try
 		let l:hotkeys  = {}
 		let l:options  = []
-		let l:commands = a:config.commands
+		let l:commands = easyops#command#GetCommands(a:config).commands
 
 		for i in range(len(l:commands))
 			let l:key          = string(i + 1 )
@@ -50,12 +41,8 @@ function! easyops#menu#InteractiveMenu(config,title) abort
 
 		if has_key(l:selection,'command')
 			call easyops#Execute(l:selection)
-			return
-		endif
-
-		let l:sub_menu_commands = easyops#command#GetCommands(l:selection.label)
-		if !empty(l:sub_menu_commands) 
-				call easyops#menu#InteractiveMenu(l:sub_menu_commands,l:selection.label)
+		else
+			call easyops#menu#InteractiveMenu(l:selection.label,l:selection.label)
 		endif
   catch /.*/
 		echo 'EasyOps: No actions available'
@@ -64,5 +51,5 @@ function! easyops#menu#InteractiveMenu(config,title) abort
 endfunction
 
 function! easyops#menu#ShowMainMenu() abort
-  call easyops#menu#InteractiveMenu(g:easyops_menu_main, 'EasyOps')
+  call easyops#menu#InteractiveMenu('main', 'EasyOps')
 endfunction

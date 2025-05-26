@@ -14,42 +14,77 @@ function! s:createPopupMenu(lines, title) abort
   let popup_id = popup_create(a:lines, s:popup_settings)
   redraw!
   call popup_close(popup_id)
-  return nr2char(getchar())
+  return nr2char(getchar()) - 1
 endfunction
 
-function! easyops#menu#InteractiveMenu(config,title) abort
+function! easyops#menu#InteractiveMenu(type,title) abort
 	try
-		let l:hotkeys  = {}
-		let l:options  = []
-		let l:commands = easyops#command#GetCommands(a:config).commands
+		let l:menu_options = {}
+		let l:menu_rows    = []
+		let l:menu    = easyops#menu#GetMenuConfig(a:type)
+		let l:options = easyops#menu#GetMenuOptions(l:menu)
 
-		for i in range(len(l:commands))
-			let l:key          = string(i + 1 )
-			let l:hotkeys[key] = l:commands[i].label
-
-			call add(l:options, l:key . ': ' . l:hotkeys[l:key])
+		for i in range(len(l:options))
+			let l:menu_options[i] = easyops#menu#GetMenuOption(l:options,i)
+			call add(l:menu_rows, i + 1 . ': ' . l:menu_options[i].label)
 		endfor
-		
-		let l:choice = s:createPopupMenu(l:options, ' ' . a:title . ' ')
 
-		if !has_key(l:hotkeys, l:choice) 
-			echo 'EasyOps: Not a valid selection'
-			return
-		endif 
+		let l:selection = easyops#menu#GetMenuSelection(l:menu_options,l:menu_rows,a:title)
 
-		let l:selection = l:commands[l:choice - 1]
-
-		if has_key(l:selection,'command')
-			call easyops#Execute(l:selection)
-		else
-			call easyops#menu#InteractiveMenu(l:selection.label,l:selection.label)
-		endif
+		call easyops#menu#ExecuteMenuSelection(l:selection)
   catch /.*/
-		echo 'EasyOps: No actions available'
+		echo 'EasyOps: Menu - ['.a:title.'] ' . v:exception
 		return
 	endtry
 endfunction
 
 function! easyops#menu#ShowMainMenu() abort
   call easyops#menu#InteractiveMenu('main', 'EasyOps')
+endfunction
+
+function!easyops#menu#ExecuteMenuSelection(choice) abort
+	try
+		if a:choice.command[:4] ==# 'menu:'
+			call easyops#menu#InteractiveMenu(a:choice.command[5:],a:choice.label)
+		else
+			call easyops#Execute(a:choice)
+		endif
+	catch
+		throw 'Unable to execute selected option: ' . v:exception 
+	endtry
+endfunction
+
+function!easyops#menu#GetMenuSelection(options,rows,title) abort
+	try
+		return a:options[s:createPopupMenu(a:rows, ' ' . a:title. ' ')]
+	catch
+		throw 'Invalid Selection'
+	endtry
+endfunction
+
+function! easyops#menu#GetMenuConfig(type) abort
+  try
+		let l:func   = 'easyops#command#' . tolower(a:type) . '#commands'
+		let l:config = get(g:, 'easyops_menu_'.a:type,{})
+
+		return empty(l:config) ? call(function(l:func),[]) : l:config
+  catch /.*/ 
+		throw 'No menu configuration defined'
+  endtry
+endfunction
+
+function! easyops#menu#GetMenuOptions(menu) abort
+  try
+		return a:menu.commands
+  catch /.*/ 
+		throw 'No options defined'
+  endtry
+endfunction
+
+function! easyops#menu#GetMenuOption(options,idx) abort
+  try
+		return a:options[a:idx]
+  catch /.*/ 
+		throw 'Invalid option configuration'
+  endtry
 endfunction

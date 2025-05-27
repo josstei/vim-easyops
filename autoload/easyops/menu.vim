@@ -10,11 +10,19 @@ let s:popup_settings = {
   \ }
 
 function! s:createPopupMenu(lines, title) abort
-	let s:popup_settings['title'] = a:title
-  let popup_id = popup_create(a:lines, s:popup_settings)
-  redraw!
-  call popup_close(popup_id)
-  return nr2char(getchar()) - 1
+  let popup_settings = copy(s:popup_settings)
+  let popup_settings['title'] = a:title
+  let popup_menu = popup_create(a:lines, popup_settings)
+  redraw
+
+  let key = getchar()
+  call popup_close(popup_menu)
+
+  if key >= char2nr('1') && key <= char2nr('9')
+    return char2nr(nr2char(key)) - char2nr('1')
+	else
+		return -1
+  endif
 endfunction
 
 function! easyops#menu#InteractiveMenu(type,title) abort
@@ -39,7 +47,7 @@ function! easyops#menu#InteractiveMenu(type,title) abort
 endfunction
 
 function! easyops#menu#ShowMainMenu() abort
-  call easyops#menu#InteractiveMenu('main', 'EasyOps')
+  call easyops#menu#InteractiveMenu('Main', 'Main')
 endfunction
 
 function!easyops#menu#ExecuteMenuSelection(choice) abort

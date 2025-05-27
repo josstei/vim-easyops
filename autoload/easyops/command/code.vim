@@ -1,4 +1,4 @@
 function! easyops#command#code#commands() abort
-	return easyops#command#GetCommands(&filetype)
+	return easyops#menu#GetMenuConfig(&filetype)
 endfunction
 

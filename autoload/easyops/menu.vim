@@ -1,40 +1,39 @@
-let s:popup_settings = {
-  \ 'title': 'EasyOps',
-  \ 'padding': [0,1,0,1],
-  \ 'border': [],
-  \ 'pos': 'center',
-  \ 'zindex': 300,
-  \ 'minwidth': 2,
-  \ 'mapping': 0,
-  \ 'drag': 0
+let s:popup_config = {
+  \ 'title'    : 'EasyOps',
+  \ 'padding'  : [0,1,0,1],
+  \ 'border'   : [],
+  \ 'pos'      : 'center',
+  \ 'zindex'   : 300,
+  \ 'minwidth' : 2,
+  \ 'mapping'  : 0,
+  \ 'drag'     : 0
   \ }
 
 function! s:createPopupMenu(lines, title) abort
-  let popup_settings = copy(s:popup_settings)
-  let popup_settings['title'] = a:title
-  let popup_menu = popup_create(a:lines, popup_settings)
+  let l:popup_config          = copy(s:popup_config)
+  let l:popup_config['title'] = a:title
+  let l:popup                 = popup_create(a:lines, l:popup_config)
+
   redraw
 
-  let key = getchar()
-  call popup_close(popup_menu)
+  let l:key = getchar()
+  call popup_close(l:popup)
 
-	if type(key) == v:t_number
-    return key - char2nr('1')
+	if type(l:key) == v:t_number
+    return l:key - char2nr('1')
   endif
 endfunction
 
 function! easyops#menu#InteractiveMenu(type,title) abort
 	try
-		let l:menu_options = {}
-		let l:menu      = easyops#menu#GetMenuConfig(a:type)
-		let l:options   = easyops#menu#GetMenuOptions(l:menu)
-		let l:menu_rows = easyops#menu#SetMenuRows(l:options) 
-		let l:selection = easyops#menu#GetMenuSelection(l:options,l:menu_rows,a:title)
+		let l:menu_config  = easyops#menu#GetMenuConfig(a:type)
+		let l:menu_options = easyops#menu#GetMenuOptions(l:menu_config)
+		let l:menu_rows    = easyops#menu#SetMenuRows(l:menu_options) 
+		let l:selection    = easyops#menu#GetMenuSelection(l:menu_options,l:menu_rows,a:title)
 
-		call easyops#menu#ExecuteMenuSelection(l:selection)
+		call easyops#menu#ExecuteMenuSelection(l:selection,l:menu_config)
   catch /.*/
 		echo 'EasyOps: Menu - ['.a:title.'] ' . v:exception
-		return
 	endtry
 endfunction
 
@@ -51,12 +50,12 @@ function!easyops#menu#SetMenuRows(options) abort
 	endtry
 endfunction
 
-function!easyops#menu#ExecuteMenuSelection(choice) abort
+function!easyops#menu#ExecuteMenuSelection(selection,config) abort
 	try
-		if a:choice.command[:4] ==# 'menu:'
-			call easyops#menu#InteractiveMenu(a:choice.command[5:],a:choice.label)
+		if a:selection.command[:4] ==# 'menu:'
+			call easyops#menu#InteractiveMenu(a:selection.command[5:],a:selection.label)
 		else
-			call easyops#Execute(a:choice)
+			call easyops#command#ExecuteCommand(a:selection,a:config)
 		endif
 	catch
 		throw 'Unable to execute selected option: ' . v:exception 

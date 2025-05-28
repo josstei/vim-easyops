@@ -1,24 +1,24 @@
-function! easyops#command#GetProjectTypeOptions(type) abort
-	let l:tasks    = []
-	let l:config   = easyops#command#GetConfig('project', a:type)
-	let l:cmd_list = l:config.commands
-	let l:cli_cmd  = easyops#command#ProjectCommand(l:config)
-	
-	for [l:label,l:cmd] in items(l:commands)
-		call add(l:tasks,[l:label, cli_cmd . l:cmd])
-	endfor
-	
-	return l:tasks
+function! easyops#command#GetCommandRoot(config) abort
+	let l:manifest = findfile(get(a:config,'manifest'),'.;')
+	return 'cd ' . shellescape(fnamemodify(l:manifest,':p:h')) . ' && '
 endfunction
 
-function! easyops#command#ProjectCommand(config) abort
-	let l:manifest    = findfile(a:config['manifest'],'.;')
-	let l:cli         = a:config.cli
-	let l:root        = fnamemodify(l:manifest,':p:h')
-	let l:cd          = 'cd ' . shellescape(l:root) . ' && '
-	let l:confFile    = easyops#config#LoadConfig(l:root)
-	let l:projectConf = get(l:confFile,a:type,{}) 
-	let l:flags       = get(l:projectConf,a:type.'_opts','')
-
-	return l:cd . l:cli. ' ' . l:flags . ' '
+function! easyops#command#GetCommandTerminal(selection,config) abort
+	let l:root    = easyops#command#GetCommandRoot(a:config)
+	let l:command = l:root . a:selection.command . ' ; echo "" ; echo "Press ENTER to close…" ; read'
+	return printf('%s %s "%s"', &shell, &shellcmdflag, substitute(l:command, '"', '\\"', 'g'))
 endfunction
+
+function! easyops#command#ExecuteCommand(selection,config) abort
+	if a:selection.command[0] ==# ':'
+		execute a:selection.command
+	else
+  	let l:command = easyops#command#GetCommandTerminal(a:selection,a:config)
+
+		execute 'belowright terminal ++close ' . l:command
+		execute 'file ' . string(a:selection.label)
+
+		if exists('+term_finish_cmd') | setlocal term_finish_cmd=close | endif
+	endif
+endfunction
+

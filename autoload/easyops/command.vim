@@ -13,7 +13,7 @@ function! easyops#command#ExecuteCommand(selection,config) abort
 	if a:selection.command[0] ==# ':'
 		execute a:selection.command
 	else
-  	let l:command = easyops#command#GetCommandTerminal(a:selection,a:config)
+		let l:command = easyops#command#GetCommandTerminal(a:selection,a:config)
 
 		execute 'belowright terminal ++close ' . l:command
 		execute 'file ' . string(a:selection.label)

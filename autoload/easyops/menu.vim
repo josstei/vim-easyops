@@ -18,26 +18,18 @@ function! s:createPopupMenu(lines, title) abort
   let key = getchar()
   call popup_close(popup_menu)
 
-  if key >= char2nr('1') && key <= char2nr('9')
-    return char2nr(nr2char(key)) - char2nr('1')
-	else
-		return -1
+	if type(key) == v:t_number
+    return key - char2nr('1')
   endif
 endfunction
 
 function! easyops#menu#InteractiveMenu(type,title) abort
 	try
 		let l:menu_options = {}
-		let l:menu_rows    = []
-		let l:menu    = easyops#menu#GetMenuConfig(a:type)
-		let l:options = easyops#menu#GetMenuOptions(l:menu)
-
-		for i in range(len(l:options))
-			let l:menu_options[i] = easyops#menu#GetMenuOption(l:options,i)
-			call add(l:menu_rows, i + 1 . ': ' . l:menu_options[i].label)
-		endfor
-
-		let l:selection = easyops#menu#GetMenuSelection(l:menu_options,l:menu_rows,a:title)
+		let l:menu      = easyops#menu#GetMenuConfig(a:type)
+		let l:options   = easyops#menu#GetMenuOptions(l:menu)
+		let l:menu_rows = easyops#menu#SetMenuRows(l:options) 
+		let l:selection = easyops#menu#GetMenuSelection(l:options,l:menu_rows,a:title)
 
 		call easyops#menu#ExecuteMenuSelection(l:selection)
   catch /.*/
@@ -46,8 +38,17 @@ function! easyops#menu#InteractiveMenu(type,title) abort
 	endtry
 endfunction
 
-function! easyops#menu#ShowMainMenu() abort
-  call easyops#menu#InteractiveMenu('Main', 'Main')
+function!easyops#menu#SetMenuRows(options) abort
+	try
+		let l:rows = []
+		for i in range(len(a:options))
+			let l:option = easyops#menu#GetMenuOption(a:options,i)
+			call add(l:rows, i + 1 . ': ' . l:option.label)
+		endfor
+		return l:rows
+	catch
+		throw 'Invalid Selection'
+	endtry
 endfunction
 
 function!easyops#menu#ExecuteMenuSelection(choice) abort

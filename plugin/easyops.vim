@@ -4,7 +4,7 @@ endif
 
 let g:loaded_easyops = 1
 
-command! EasyOps call easyops#menu#ShowMainMenu()
+command! EasyOps call easyops#menu#InteractiveMenu('Main','Main')
 
 nnoremap <silent> <leader>m :EasyOps<CR>
 

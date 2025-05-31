@@ -1,5 +1,5 @@
 let s:popup_config = {
-  \ 'title'    : 'EasyOps',
+  \ 'title'    : 'easyops',
   \ 'padding'  : [0,1,0,1],
   \ 'border'   : [],
   \ 'pos'      : 'center',
@@ -9,68 +9,103 @@ let s:popup_config = {
   \ 'drag'     : 0
   \ }
 
-function! s:createPopupMenu(lines, title) abort
-  let l:popup_config          = copy(s:popup_config)
-  let l:popup_config['title'] = a:title
-  let l:popup                 = popup_create(a:lines, l:popup_config)
-
+function! s:createpopupmenu(lines, title) abort
+  let l:config       = copy(s:popup_config)
+  let l:config.title = a:title
+  let l:popup        = popup_create(a:lines, l:config)
   redraw
+  let l:count  = len(a:lines)
+  let l:result = l:count < 10 ? s:get_single_digit_selection(l:count) : s:get_multi_digit_selection(l:count)
 
-  let l:key = getchar()
   call popup_close(l:popup)
-
-	if type(l:key) == v:t_number
-    return l:key - char2nr('1')
-  endif
+	if l:result == -1 
+		throw 'Menu Closed'
+	endif	
+  return l:result
 endfunction
 
-function! easyops#menu#InteractiveMenu(type,title) abort
-	try
-		let l:menu_config  = easyops#menu#GetMenuConfig(a:type)
-		let l:menu_options = easyops#menu#GetMenuOptions(l:menu_config)
-		let l:menu_rows    = easyops#menu#SetMenuRows(l:menu_options) 
-		let l:selection    = easyops#menu#GetMenuSelection(l:menu_options,l:menu_rows,a:title)
+function! s:get_single_digit_selection(count) abort
+  let key = getchar()
+  if type(key) != v:t_number | return -1 | endif
+  if key == 27 || key == char2nr('q') | return -1 | endif
 
-		call easyops#menu#ExecuteMenuSelection(l:selection,l:menu_config)
+  let index = key - char2nr('1')
+  return index >= 0 && index < a:count ? index : -1
+endfunction
+
+function! s:get_multi_digit_selection(count) abort
+  let digits = ''
+  let last = reltime()
+
+  while 1
+    let key = getchar(0)
+
+    if key == 0
+      if !empty(digits) && reltimefloat(reltime(last)) > 0.5 | break | endif
+      sleep 10m
+      continue
+    endif
+
+    let last = reltime()
+
+    if key == 27 || key == char2nr('q') | return -1 | endif
+
+    if type(key) == v:t_number
+      let char = nr2char(key)
+      if char =~# '\d'
+        let digits .= char
+      endif
+    endif
+  endwhile
+
+  let index = str2nr(digits) - 1
+  return index >= 0 && index < a:count ? index : -1
+endfunction
+
+function! easyops#menu#interactivemenu(type, title) abort
+  try
+    let l:configs   = easyops#menu#getmenuconfigs(a:type)
+    let l:menu      = easyops#menu#buildmenu(l:configs)
+    let l:entry     = s:createpopupmenu(l:menu.rows, ' ' . a:title . ' ')
+		let l:selection = easyops#menu#getmenuoption(l:menu.options,l:entry)
+
+    call easyops#menu#executemenuselection(l:selection, l:selection.config)
+
   catch /.*/
-		echo 'EasyOps: Menu - ['.a:title.'] ' . v:exception
-	endtry
+		echom 'Easyops: Menu - ['.a:title.'] ' . v:exception
+  endtry
 endfunction
 
-function!easyops#menu#SetMenuRows(options) abort
-	try
-		let l:rows = []
-		for i in range(len(a:options))
-			let l:option = easyops#menu#GetMenuOption(a:options,i)
-			call add(l:rows, i + 1 . ': ' . l:option.label)
-		endfor
-		return l:rows
-	catch
-		throw 'Invalid Selection'
-	endtry
+function! easyops#menu#buildmenu(types) abort
+  let l:options = []
+  for l:type in a:types
+		call easyops#menu#addmenuoptions(l:options,l:type)
+  endfor
+	let l:rows = map(copy(l:options), {idx, val -> (idx + 1) . ': ' . val.label})
+
+  return { 'options': l:options, 'rows' : l:rows }
 endfunction
 
-function!easyops#menu#ExecuteMenuSelection(selection,config) abort
+function! easyops#menu#addmenuoptions(menu,type) abort
+  let l:config  = easyops#menu#getmenuconfig(a:type)
+  for l:opt in easyops#menu#getmenuoptions(l:config)
+    call add(a:menu, {'label': l:opt.label,'command': l:opt.command,'config': l:config})
+  endfor
+endfunction
+
+function! easyops#menu#executemenuselection(selection,config) abort
 	try
 		if a:selection.command[:4] ==# 'menu:'
-			call easyops#menu#InteractiveMenu(a:selection.command[5:],a:selection.label)
+			call easyops#menu#interactivemenu(a:selection.command[5:],a:selection.label)
 		else
-			call easyops#command#ExecuteCommand(a:selection,a:config)
+			call easyops#command#executecommand(a:selection,a:config)
 		endif
 	catch
 		throw 'Unable to execute selected option: ' . v:exception 
 	endtry
 endfunction
 
-function!easyops#menu#GetMenuSelection(options,rows,title) abort
-	try
-		return a:options[s:createPopupMenu(a:rows, ' ' . a:title. ' ')]
-	catch
-		throw 'Invalid Selection'
-	endtry
-endfunction
-
-function! easyops#menu#GetMenuConfig(type) abort
+function! easyops#menu#getmenuconfig(type) abort
   try
 		let l:func   = 'easyops#command#' . tolower(a:type) . '#commands'
 		let l:config = get(g:, 'easyops_menu_'.a:type,{})
@@ -81,18 +116,26 @@ function! easyops#menu#GetMenuConfig(type) abort
   endtry
 endfunction
 
-function! easyops#menu#GetMenuOptions(menu) abort
+function! easyops#menu#getmenuoptions(config) abort
   try
-		return a:menu.commands
+		return get(a:config,'commands',[{'label':'no options available'}])
   catch /.*/ 
 		throw 'No options defined'
   endtry
 endfunction
 
-function! easyops#menu#GetMenuOption(options,idx) abort
+function! easyops#menu#getmenuoption(options,idx) abort
   try
 		return a:options[a:idx]
   catch /.*/ 
 		throw 'Invalid option configuration'
+  endtry
+endfunction
+
+function! easyops#menu#getmenuconfigs(configs) abort
+	try
+	return map(split(a:configs, '|'), 'trim(v:val)')
+  catch /.*/ 
+		throw 'Invalid menu configuration'
   endtry
 endfunction

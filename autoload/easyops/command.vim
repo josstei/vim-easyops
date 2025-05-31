@@ -9,7 +9,7 @@ function! easyops#command#GetCommandTerminal(selection,config) abort
 	return printf('%s %s "%s"', &shell, &shellcmdflag, substitute(l:command, '"', '\\"', 'g'))
 endfunction
 
-function! easyops#command#ExecuteCommand(selection,config) abort
+function! easyops#command#executecommand(selection,config) abort
 	if a:selection.command[0] ==# ':'
 		execute a:selection.command
 	else

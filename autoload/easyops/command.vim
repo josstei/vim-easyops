@@ -15,7 +15,7 @@ function! easyops#command#executecommand(selection,config) abort
 	else
 		let l:command = easyops#command#GetCommandTerminal(a:selection,a:config)
 
-		execute 'belowright terminal ++close ' . l:command
+		execute 'botright terminal ++close ' . l:command
 		execute 'file ' . string(a:selection.label)
 
 		if exists('+term_finish_cmd') | setlocal term_finish_cmd=close | endif

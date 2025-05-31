@@ -18,48 +18,38 @@ function! s:createpopupmenu(lines, title) abort
   let l:result = l:count < 10 ? s:get_single_digit_selection(l:count) : s:get_multi_digit_selection(l:count)
 
   call popup_close(l:popup)
-	if l:result == -1 
-		throw 'Menu Closed'
-	endif	
+
+	if l:result == -1  | throw 'Menu Closed' | endif	
   return l:result
 endfunction
 
-function! s:get_single_digit_selection(count) abort
-  let key = getchar()
-  if type(key) != v:t_number | return -1 | endif
-  if key == 27 || key == char2nr('q') | return -1 | endif
+function! s:validatepopupinput(key)
+  if type(a:key) != v:t_number | return -1 | endif
+  if a:key == 27               | return -1 | endif
+	if a:key == char2nr('q')     | return -1 | endif
+	return a:key
+endfunction
 
-  let index = key - char2nr('1')
-  return index >= 0 && index < a:count ? index : -1
+function! s:get_single_digit_selection(count) abort
+	return s:validatepopupinput(getchar()) - char2nr('1')
 endfunction
 
 function! s:get_multi_digit_selection(count) abort
-  let digits = ''
-  let last = reltime()
+  let input = ''
 
-  while 1
+  while 1 
     let key = getchar(0)
-
+		
     if key == 0
-      if !empty(digits) && reltimefloat(reltime(last)) > 0.5 | break | endif
-      sleep 10m
-      continue
+      if !empty(input) && reltimefloat(reltime(last)) > 0.3 | break | endif
+      sleep 10m | continue
     endif
-
-    let last = reltime()
-
-    if key == 27 || key == char2nr('q') | return -1 | endif
-
-    if type(key) == v:t_number
-      let char = nr2char(key)
-      if char =~# '\d'
-        let digits .= char
-      endif
-    endif
+		
+    let last   = reltime()
+		let input .= nr2char(s:validatepopupinput(key))
   endwhile
 
-  let index = str2nr(digits) - 1
-  return index >= 0 && index < a:count ? index : -1
+  return str2nr(input) - 1
 endfunction
 
 function! easyops#menu#interactivemenu(type, title) abort
@@ -107,12 +97,19 @@ endfunction
 
 function! easyops#menu#getmenuconfig(type) abort
   try
-		let l:func   = 'easyops#command#' . tolower(a:type) . '#commands'
-		let l:config = get(g:, 'easyops_menu_'.a:type,{})
+    let l:key    = 'easyops_menu_' . a:type
+    let l:config = get(g:, l:key, v:null)
 
-		return empty(l:config) ? call(function(l:func),[]) : l:config
-  catch /.*/ 
-		throw 'No menu configuration defined'
+    if l:config is# v:null
+      let l:func   = 'easyops#command#' . tolower(a:type) . '#commands'
+      let l:config = call(function(l:func), [])
+    endif
+
+    if empty(l:config) | throw 'No menu configuration defined' | endif
+
+    return l:config
+  catch /.*/
+    throw 'No menu configuration defined'
   endtry
 endfunction
 
@@ -128,7 +125,7 @@ function! easyops#menu#getmenuoption(options,idx) abort
   try
 		return a:options[a:idx]
   catch /.*/ 
-		throw 'Invalid option configuration'
+		throw 'Invalid selection'
   endtry
 endfunction
 

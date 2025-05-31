@@ -5,7 +5,8 @@ function! easyops#command#main#commands() abort
 				\ { 'label' : 'Window',  'command':'menu:window'}, 
 				\ { 'label' : 'File',    'command':'menu:file'}, 
 				\ { 'label' : 'Code',    'command':'menu:code'}, 
-				\ { 'label' : 'Project', 'command':'menu:manifest'} 
+				\ { 'label' : 'Project', 'command':'menu:manifest'},
+				\ { 'label' : 'Close VIM', 'command':':qa!'} 
 				\	]
 		endif
   if !exists('g:easyops_menu_main')

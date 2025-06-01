@@ -21,4 +21,3 @@ function! easyops#command#executecommand(selection,config) abort
 		if exists('+term_finish_cmd') | setlocal term_finish_cmd=close | endif
 	endif
 endfunction
-

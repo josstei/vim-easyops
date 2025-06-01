@@ -1,16 +1,5 @@
-let s:popup_config = {
-  \ 'title'    : 'easyops',
-  \ 'padding'  : [0,1,0,1],
-  \ 'border'   : [],
-  \ 'pos'      : 'center',
-  \ 'zindex'   : 300,
-  \ 'minwidth' : 2,
-  \ 'mapping'  : 0,
-  \ 'drag'     : 0
-  \ }
-
 function! s:createpopupmenu(lines, title) abort
-  let l:config       = copy(s:popup_config)
+  let l:config       = copy(g:easyops_popup_config) 
   let l:config.title = a:title
   let l:popup        = popup_create(a:lines, l:config)
   redraw
@@ -56,11 +45,10 @@ function! easyops#menu#interactivemenu(type, title) abort
   try
     let l:configs   = easyops#menu#getmenuconfigs(a:type)
     let l:menu      = easyops#menu#buildmenu(l:configs)
-    let l:entry     = s:createpopupmenu(l:menu.rows, ' ' . a:title . ' ')
-		let l:selection = easyops#menu#getmenuoption(l:menu.options,l:entry)
+    let l:input			= s:createpopupmenu(l:menu.rows, ' ' . a:title . ' ')
+		let l:selection = easyops#menu#getmenuoption(l:menu.options,l:input)
 
     call easyops#menu#executemenuselection(l:selection, l:selection.config)
-
   catch /.*/
 		echom 'Easyops: Menu - ['.a:title.'] ' . v:exception
   endtry

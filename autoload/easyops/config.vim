@@ -1,17 +1,39 @@
-function! easyops#config#InitConfig(root,type,config) abort
-  let l:file    = easyops#config#GetConfig(root) abort
-	let l:default = a:config.default
+function! easyops#config#GetDefaultJSON() abort
+  let l:config = {
+  \   'environment': {
+  \   },
+  \ }
+  return json_encode(l:config)
+endfunction
 
-	if !has_key(a:cfg, a:project_type)
-    let a:cfg[a:type] = a:defaults
-    let l:configState = 'config initialized in ' . l:file
+function! easyops#config#CreateEasyOpsConfig() abort
+  let l:manifest = easyops#GetManifestFile() 
+  let l:dir      = get(l:manifest,'root',getcwd()) . '/' . g:easyops_dotfile_config
+  let l:default  = easyops#config#GetDefaultJSON()
 
-    call writefile([json_encode(a:cfg)], l:file)
+  if !filereadable(l:dir)
+    call writefile(split(l:default,'\n'), l:dir)
+    echom g:easyops_dotfile_config .' file created at ' . l:dir
   else
-    let l:configState = 'config already exists'
+    echom g:easyops_dotfile_config .' file already exists at ' . l:dir
   endif
+endfunction
 
-  echom 'EasyOps: ' . a:project_type . ' ' .l:configState
+function! easyops#config#InitConfig() abort
+    let l:manifest_file    = easyops#getmanifestfile() 
+    let l:easyops_config   = easyops#config#GetEasyOpsConfig(l:manifest.root) abort
+    let l:menu_config      = easyops#menu#getmenuconfig(l:manifest.type) 
+
+    if !has_key(a:cfg, a:project_type)
+        let a:cfg[a:type] = a:defaults
+        let l:configState = 'config initialized in ' . l:file
+
+        call writefile([json_encode(a:cfg)], l:file)
+    else
+        let l:configState = 'config already exists'
+    endif
+
+    echom 'EasyOps: ' . a:project_type . ' ' .l:configState
 endfunction
 
 function! easyops#config#LoadConfig(root) abort
@@ -28,6 +50,6 @@ function! easyops#config#LoadConfig(root) abort
   return l:cfg
 endfunction
 
-function! easyops#config#GetConfig(root) abort
+function! easyops#config#GetEasyOpsConfig(root) abort
   return a:root . '/.easyops.json'
 endfunction

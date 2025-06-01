@@ -9,6 +9,8 @@ command! EasyOps call easyops#menu#interactivemenu('Main','Main')
 nnoremap <silent> <leader>m :EasyOps<CR>
 
 " ***** Default Configurations *****
+let g:easyops_dotfile_config = '.easyops.json'
+    
 let g:easyops_popup_config = {
   \ 'title'    : 'easyops',
   \ 'padding'  : [0,1,0,1],
@@ -20,7 +22,7 @@ let g:easyops_popup_config = {
   \ 'drag'     : 0
   \ }
 
-let g:easyops_manifest_files = {
+let g:easyops_manifest_config = {
   \ 'maven':          'pom.xml',
   \ 'gradle':         'build.gradle',
   \ 'gradle_kts':     'build.gradle.kts',
@@ -51,3 +53,9 @@ let g:easyops_manifest_files = {
   \ 'astro':          'astro.config.mjs'
   \ }
 
+let g:easyops_language_config= {
+  \ 'java': {
+  \   'flags': [],
+  \   'classpath': ''
+  \ },
+  \ }

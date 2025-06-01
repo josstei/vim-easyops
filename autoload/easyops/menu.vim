@@ -4,26 +4,34 @@ function! s:createpopupmenu(lines, title) abort
   let l:popup        = popup_create(a:lines, l:config)
   redraw
   let l:count  = len(a:lines)
-  let l:result = l:count < 10 ? s:get_single_digit_selection(l:count) : s:get_multi_digit_selection(l:count)
+  let l:result = easyops#menu#GetInput(l:count)
 
   call popup_close(l:popup)
 
-	if l:result == -1  | throw 'Menu Closed' | endif	
+  if l:result == -1  | throw 'Menu Closed' | endif	
   return l:result
 endfunction
 
-function! s:validatepopupinput(key)
+function easyops#menu#GetInput(count)
+    if a:count < 10
+        return easyops#menu#GetInputSingle(a:count)
+    else
+        return easyops#menu#GetInputMulti(a:count)
+    endif
+endfunction
+
+function! easyops#menu#ValidateInput(key)
   if type(a:key) != v:t_number | return -1 | endif
   if a:key == 27               | return -1 | endif
 	if a:key == char2nr('q')     | return -1 | endif
 	return a:key
 endfunction
 
-function! s:get_single_digit_selection(count) abort
-	return s:validatepopupinput(getchar()) - char2nr('1')
+function! easyops#menu#GetInputSingle(count) abort
+	return easyops#menu#ValidateInput(getchar()) - char2nr('1')
 endfunction
 
-function! s:get_multi_digit_selection(count) abort
+function! easyops#menu#GetInputMulti(count) abort
   let input = ''
 
   while 1 
@@ -35,7 +43,7 @@ function! s:get_multi_digit_selection(count) abort
     endif
 		
     let last   = reltime()
-		let input .= nr2char(s:validatepopupinput(key))
+		let input .= nr2char(easyops#menu#ValidateInput(key))
   endwhile
 
   return str2nr(input) - 1
@@ -44,9 +52,9 @@ endfunction
 function! easyops#menu#interactivemenu(type, title) abort
   try
     let l:configs   = easyops#menu#getmenuconfigs(a:type)
-    let l:menu      = easyops#menu#buildmenu(l:configs)
-    let l:input			= s:createpopupmenu(l:menu.rows, ' ' . a:title . ' ')
-		let l:selection = easyops#menu#getmenuoption(l:menu.options,l:input)
+    let l:menu      = easyops#menu#initmenu(l:configs)
+    let l:input     = s:createpopupmenu(l:menu.rows, ' ' . a:title . ' ')
+    let l:selection = easyops#menu#getmenuoption(l:menu.options,l:input)
 
     call easyops#menu#executemenuselection(l:selection, l:selection.config)
   catch /.*/
@@ -54,7 +62,7 @@ function! easyops#menu#interactivemenu(type, title) abort
   endtry
 endfunction
 
-function! easyops#menu#buildmenu(types) abort
+function! easyops#menu#initmenu(types) abort
   let l:options = []
   for l:type in a:types
 		call easyops#menu#addmenuoptions(l:options,l:type)

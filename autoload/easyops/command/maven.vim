@@ -21,3 +21,9 @@ function! easyops#command#maven#commands() abort
   return g:easyops_menu_maven
 endfunction
 
+function! EasyOps_Build(cmd) abort
+  call EasyOps_LoadEnvVars()
+  let l:opts = get(g:easyops_env, 'MAVEN_OPTS', '')
+  execute '!MAVEN_OPTS=' . shellescape(l:opts) . ' mvn ' . a:cmd
+endfunction
+

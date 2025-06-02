@@ -1,55 +1,33 @@
-function! easyops#config#GetDefaultJSON() abort
-  let l:config = {
-  \   'environment': {
-  \   },
-  \ }
-  return json_encode(l:config)
-endfunction
-
 function! easyops#config#CreateEasyOpsConfig() abort
-  let l:manifest = easyops#GetManifestFile() 
-  let l:dir      = get(l:manifest,'root',getcwd()) . '/' . g:easyops_dotfile_config
-  let l:default  = easyops#config#GetDefaultJSON()
+    let l:dir = easyops#config#GetEasyOpsConfig()
 
-  if !filereadable(l:dir)
-    call writefile(split(l:default,'\n'), l:dir)
-    echom g:easyops_dotfile_config .' file created at ' . l:dir
-  else
-    echom g:easyops_dotfile_config .' file already exists at ' . l:dir
-  endif
-endfunction
-
-function! easyops#config#InitConfig() abort
-    let l:manifest_file    = easyops#GetManifestFile() 
-    let l:easyops_config   = easyops#config#GetEasyOpsConfig(l:manifest.root) abort
-    let l:menu_config      = easyops#menu#getmenuconfig(l:manifest.type) 
-
-    if !has_key(a:cfg, a:project_type)
-        let a:cfg[a:type] = a:defaults
-        let l:configState = 'config initialized in ' . l:file
-
-        call writefile([json_encode(a:cfg)], l:file)
+    if !filereadable(l:dir)
+        call writefile(split(json_encode(g:easyops_dotfile_default),'\n'), l:dir)
+        call easyops#config#PrintCreateMessage('created',l:dir) 
     else
-        let l:configState = 'config already exists'
+        call easyops#config#PrintCreateMessage('exists',l:dir) 
     endif
-
-    echom 'EasyOps: ' . a:project_type . ' ' .l:configState
 endfunction
 
-function! easyops#config#LoadConfig(root) abort
-  let l:cfg  = {}
-  let l:file = easyops#config#GetConfig(a:root) 
-
-  if filereadable(l:file)
-    try
-      let l:cfg = json_decode(join(readfile(l:file), "\n"))
-    catch
-    endtry
-  endif
-
-  return l:cfg
+function! easyops#config#PrintCreateMessage(message,dir) 
+    echom g:easyops_dotfile_config .' file ' . a:message ' at '  . a:dir
 endfunction
 
-function! easyops#config#GetEasyOpsConfig(root) abort
-  return a:root . '/.easyops.json'
+function! easyops#config#GetEasyOpsConfig() abort
+    let l:manifest = easyops#GetManifestFile() 
+    return get(l:manifest,'root',getcwd()) . '/' . g:easyops_dotfile_config
+endfunction
+
+function! easyops#config#LoadEasyOpsConfig() abort
+    let l:file = expand(easyops#config#GetEasyOpsConfig())
+    if filereadable(l:file)
+        let l:json = join(readfile(l:file), "\n")
+        let l:data = json_decode(l:json)
+
+        if has_key(l:data, 'environment')
+            let g:easyops_env = l:data.environment
+        else
+            echoerr "No 'environment' key found in .easyops.json"
+        endif
+    endif
 endfunction

@@ -9,8 +9,9 @@ command! EasyOps call easyops#menu#interactivemenu('Main','Main')
 nnoremap <silent> <leader>m :EasyOps<CR>
 
 " ***** Default Configurations *****
-let g:easyops_dotfile_config = '.easyops.json'
-    
+let g:easyops_dotfile_config    = '.easyops.json'
+let g:easyops_dotfile_default   =  {'environment': {}}   
+
 let g:easyops_popup_config = {
   \ 'title'    : 'easyops',
   \ 'padding'  : [0,1,0,1],

@@ -5,8 +5,8 @@ function! easyops#command#main#commands() abort
 				\ { 'label' : 'Window',  'command':'menu:window'}, 
 				\ { 'label' : 'File',    'command':'menu:file'}, 
 				\ { 'label' : 'Code',    'command':'menu:code|manifest'}, 
-				\ { 'label' : 'Config',    'command':'menu:easyopsconfig'}, 
-				\	]
+				\ { 'label' : 'Config',  'command':'menu:easyopsconfig'}, 
+				\ ]
 		endif
   if !exists('g:easyops_menu_main')
    let g:easyops_menu_main = { 'commands' : g:easyops_commands_main}

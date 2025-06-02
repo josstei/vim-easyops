@@ -20,7 +20,7 @@ function! easyops#config#CreateEasyOpsConfig() abort
 endfunction
 
 function! easyops#config#InitConfig() abort
-    let l:manifest_file    = easyops#getmanifestfile() 
+    let l:manifest_file    = easyops#GetManifestFile() 
     let l:easyops_config   = easyops#config#GetEasyOpsConfig(l:manifest.root) abort
     let l:menu_config      = easyops#menu#getmenuconfig(l:manifest.type) 
 

@@ -6,7 +6,7 @@ function! easyops#command#window#commands() abort
                     \]
     endif
     if !exists('g:easyops_menu_window')
-        let g:easyops_menu_window= { 'commands' : g:easyops_commands_window}
+        let g:easyops_menu_window = { 'commands' : g:easyops_commands_window}
     endif
     return g:easyops_menu_window
 endfunction

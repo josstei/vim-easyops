@@ -5,7 +5,7 @@ function! easyops#command#maven#commands() abort
       \ { 'label': 'Maven: Compile',  'command': 'mvn compile' },
       \ { 'label': 'Maven: Test',     'command': 'mvn test' },
       \ { 'label': 'Maven: Package',  'command': 'mvn package' },
-      \ { 'label': 'Maven: Install',  'command': 'mvn install' },
+      \ { 'label': 'Maven: Install',  'command': 'mvn -X install' },
       \ { 'label': 'Maven: Verify',   'command': 'mvn verify' },
       \ { 'label': 'Maven: Deploy',   'command': 'mvn deploy' }
       \ ]

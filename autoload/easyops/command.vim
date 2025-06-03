@@ -28,7 +28,7 @@ function! easyops#command#GetEnv() abort
 
     if exists('g:easyops_env')
         for [key, val] in items(g:easyops_env)
-            call add(l:env_parts, key . '=' . shellescape(val))
+            call add(l:env_parts, key . '=' . shellescape(val,1))
         endfor
     endif
     return join(l:env_parts, ' ')

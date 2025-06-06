@@ -1,27 +1,17 @@
 if exists('g:loaded_easyops')
-  finish
+    finish
 endif
 
-let g:loaded_easyops = 1
+let g:loaded_easyops    = 1
+let g:easyops_nvim      = has('nvim')
 
-command! EasyOps call easyops#menu#interactivemenu('Main','Main')
+command! EasyOps call easyops#menu#Open('Main','Main')
 
 nnoremap <silent> <leader>m :EasyOps<CR>
 
 " ***** Default Configurations *****
 let g:easyops_dotfile_config    = '.easyops.json'
 let g:easyops_dotfile_default   =  {'environment': {}}   
-
-let g:easyops_popup_config = {
-  \ 'title'    : 'easyops',
-  \ 'padding'  : [0,1,0,1],
-  \ 'border'   : [],
-  \ 'pos'      : 'center',
-  \ 'zindex'   : 300,
-  \ 'minwidth' : 2,
-  \ 'mapping'  : 0,
-  \ 'drag'     : 0
-  \ }
 
 let g:easyops_manifest_config = {
   \ 'maven':          'pom.xml',

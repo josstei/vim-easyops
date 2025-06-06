@@ -10,15 +10,15 @@ function! easyops#command#BuildTerminalCommand(command,config) abort
 	return printf('%s %s "%s"', &shell, &shellcmdflag, substitute(l:full_command, '"', '\\"', 'g'))
 endfunction
 
-function! easyops#command#executecommand(selection,config) abort
-    let l:command   = a:selection.command
+function! easyops#command#Execute(selection,config) abort
+    let l:command   = a:selection.cmd
     let l:label     = a:selection.label
 
 	if l:command[0] ==# ':'
 		execute l:command
 	else
 		let l:command = easyops#command#BuildTerminalCommand(l:command,a:config)
-        call easyops#command#ExecuteTerminalCommand(l:command,l:label)
+        call easyops#command#ExecuteTerminal(l:command,l:label)
 	endif
 endfunction
 
@@ -34,9 +34,21 @@ function! easyops#command#GetEnv() abort
     return join(l:env_parts, ' ')
 endfunction
 
-function! easyops#command#ExecuteTerminalCommand(command,label) abort
-    execute 'botright terminal ++close ' . a:command
-    execute 'file ' . string(a:label)
-    if exists('+term_finish_cmd') | setlocal term_finish_cmd=close | endif
-endfunction
+function! easyops#command#ExecuteTerminal(command, label) abort
+    if !exists('g:term_bufnr') || !bufexists(g:term_bufnr) || !buflisted(g:term_bufnr)
+        if has('nvim')
+            botright 15split
+            terminal
+        else
+            botright terminal
+            resize 15
+        endif
+        let g:term_bufnr = bufnr('%')
+    else
+        botright 15split
+        execute 'buffer' g:term_bufnr
+    endif
 
+    call feedkeys("i" . a:command . "\r", "t")
+    execute 'file ' . string(a:label)
+endfunction

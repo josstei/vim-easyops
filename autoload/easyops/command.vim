@@ -1,13 +1,13 @@
 function! easyops#command#GetCommandRoot(config) abort
-	let l:manifest = findfile(get(a:config,'manifest'),'.;')
-	return 'cd ' . shellescape(fnamemodify(l:manifest,':p:h')) . ' && '
+    let l:manifest = findfile(get(a:config,'manifest'),'.;')
+    return 'cd ' . shellescape(fnamemodify(l:manifest,':p:h')) . ' && '
 endfunction
 
 function! easyops#command#BuildTerminalCommand(command,config) abort
-	let l:root          = easyops#command#GetCommandRoot(a:config)
+    let l:root          = easyops#command#GetCommandRoot(a:config)
     let l:env           = easyops#command#GetEnv()
-	let l:full_command  = l:root . l:env . ' ' . a:command . ' ; echo "" ; echo "Press ENTER to close…" ; read'
-	return printf('%s %s "%s"', &shell, &shellcmdflag, substitute(l:full_command, '"', '\\"', 'g'))
+    let l:full_command  = l:root . l:env . ' ' . a:command . ' ; echo "" ; echo "Press ENTER to close…" ; read'
+    return printf('%s %s "%s"', &shell, &shellcmdflag, substitute(l:full_command, '"', '\\"', 'g'))
 endfunction
 
 function! easyops#command#Execute(selection,config) abort

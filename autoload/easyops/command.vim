@@ -38,4 +38,5 @@ function! easyops#command#ExecuteCommand(command, label) abort
     call easyops#buffer#Get()
     call easyops#terminal#Execute(a:command)
     call easyops#buffer#Rename(a:label)
+"     call easyops#terminal#Close()
 endfunction

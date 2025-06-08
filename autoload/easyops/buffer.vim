@@ -12,5 +12,5 @@ function! easyops#buffer#Get() abort
 endfunction
 
 function! easyops#buffer#Rename(label) abort
-"     execute 'file ' . string(a:label)
+    execute 'file ' . string(a:label)
 endfunction

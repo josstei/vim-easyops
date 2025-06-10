@@ -5,8 +5,7 @@ endfunction
 
 function! easyops#command#BuildTerminalCommand(command,config) abort
     let l:root          = easyops#command#GetRoot(a:config)
-    let l:env           = easyops#command#GetEnv()
-    let l:full_command  = l:root . l:env . ' ' . a:command
+    let l:full_command  = l:root .' ' . a:command
     return l:full_command
 endfunction
 
@@ -37,6 +36,4 @@ endfunction
 function! easyops#command#ExecuteCommand(command, label) abort
     call easyops#buffer#Get()
     call easyops#terminal#Execute(a:command)
-    call easyops#buffer#Rename(a:label)
-"     call easyops#terminal#Close()
 endfunction

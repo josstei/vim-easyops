@@ -6,7 +6,7 @@ endfunction
 function! easyops#command#BuildTerminalCommand(command,config) abort
     let l:root          = easyops#command#GetRoot(a:config)
     let l:env           = easyops#command#GetEnv()
-    let l:full_command  = l:root . l:env . ' ' . a:command . ' ; echo "" ; echo "Press ENTER to close…" ; read'
+    let l:full_command  = l:root . l:env . ' ' . a:command
     return l:full_command
 endfunction
 

@@ -7,7 +7,7 @@ function! easyops#command#BuildTerminalCommand(command,config) abort
     let l:root          = easyops#command#GetRoot(a:config)
     let l:env           = easyops#command#GetEnv()
     let l:full_command  = l:root . l:env . ' ' . a:command . ' ; echo "" ; echo "Press ENTER to close…" ; read'
-    return substitute(l:full_command, '"', '\\"', 'g')
+    return l:full_command
 endfunction
 
 function! easyops#command#Execute(selection,config) abort
@@ -28,7 +28,7 @@ function! easyops#command#GetEnv() abort
 
     if exists('g:easyops_env')
         for [key, val] in items(g:easyops_env)
-            call add(l:env_parts, key . '=' . shellescape(val,1))
+            execute 'let $' . key .' = ' . shellescale(val,1)
         endfor
     endif
     return join(l:env_parts, ' ')

@@ -7,7 +7,7 @@ function! easyops#command#BuildTerminalCommand(command,config) abort
     let l:root          = easyops#command#GetRoot(a:config)
     let l:env           = easyops#command#GetEnv()
     let l:full_command  = l:root . l:env . ' ' . a:command . ' ; echo "" ; echo "Press ENTER to close…" ; read'
-    return printf('%s %s "%s"', &shell, &shellcmdflag, substitute(l:full_command, '"', '\\"', 'g'))
+    return substitute(l:full_command, '"', '\\"', 'g')
 endfunction
 
 function! easyops#command#Execute(selection,config) abort

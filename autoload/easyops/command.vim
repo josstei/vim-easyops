@@ -23,9 +23,13 @@ function! easyops#command#Execute(selection,config) abort
 endfunction
 
 function! easyops#command#LoadEnv() abort
-    if exists('g:easyenv_loaded') && g:easyenv_loaded
-        call easyenv#Execute('Load')
-    endif
+    try
+        if exists('g:easyenv_loaded') && g:easyenv_loaded
+            call easyenv#Execute('Load')
+        endif
+    catch /.*/
+        
+    endtry
 endfunction
 
 function! easyops#command#ExecuteCommand(command, label) abort

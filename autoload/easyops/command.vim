@@ -17,20 +17,15 @@ function! easyops#command#Execute(selection,config) abort
 		execute l:command
 	else
 		let l:command = easyops#command#BuildTerminalCommand(l:command,a:config)
+        call easyops#command#LoadEnv()
         call easyops#command#ExecuteCommand(l:command,l:label)
 	endif
 endfunction
 
-function! easyops#command#GetEnv() abort
-    call easyops#config#LoadEasyOpsConfig()
-    let l:env_parts = []
-
-    if exists('g:easyops_env')
-        for [key, val] in items(g:easyops_env)
-            execute 'let $' . key .' = ' . shellescale(val,1)
-        endfor
+function! easyops#command#LoadEnv() abort
+    if exists('g:easyenv_loaded') && g:easyenv_loaded
+        call easyenv#Execute('Load')
     endif
-    return join(l:env_parts, ' ')
 endfunction
 
 function! easyops#command#ExecuteCommand(command, label) abort

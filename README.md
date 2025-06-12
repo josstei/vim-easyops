@@ -2,7 +2,7 @@
 
 # vim-easyops
 
-`vim-easyops` is a Vim plugin that delivers a unified, extensible menu for common development tasks—making it painless to work with files, projects, and version control within Vim. It detects your project type and loads context-aware menus for Git, Java, Rust, npm, Maven, Bundler, and more.
+`vim-easyops` is a Vim/Neovim plugin that delivers a unified, extensible menu for common development tasks—making it painless to work with files, projects, and version control within Vim. It detects your project type and loads context-aware menus for Git, Java, Rust, npm, Maven, Bundler, and more.
 
 ---
 

@@ -2,7 +2,7 @@
 
 # vim-easyops
 
-`vim-easyops` is a Vim plugin that delivers a unified, extensible menu for common development tasks—making it painless to work with files, projects, and version control within Vim. It detects your project type and provides context-aware commands for file operations, Git, build tools, package managers, and more.
+`vim-easyops` is a Vim plugin that delivers a unified, extensible menu for common development tasks—making it painless to work with files, projects, and version control within Vim. It detects your project type and loads context-aware menus for Git, Java, Rust, npm, Maven, Bundler, and more.
 
 ---
 
@@ -20,12 +20,44 @@
 
 ---
 
-## Installation
+## Installation (Vim & Neovim)
 
-Add to your Vim plugin manager. For example, using `vim-plug`:
+You can install vim-easyops in both Vim and Neovim using your favorite plugin manager or manually.
+
+### Using [vim-plug](https://github.com/junegunn/vim-plug)
+
+Add this to your `.vimrc` (Vim) or `init.vim`/`init.lua` (Neovim):
 
 ```vim
 Plug 'josstei/vim-easyops'
+```
+Then start Vim/Neovim and run:
+```
+:PlugInstall
+```
+
+### Using [packer.nvim](https://github.com/wbthomason/packer.nvim) (Neovim)
+
+Add this to your `init.lua`:
+```lua
+use 'josstei/vim-easyops'
+```
+Then run:
+```
+:PackerSync
+```
+
+### Manual installation
+
+Clone the repository using the official link:
+
+For Vim:
+```sh
+git clone https://github.com/josstei/vim-easyops ~/.vim/pack/plugins/start/vim-easyops
+```
+For Neovim:
+```sh
+git clone https://github.com/josstei/vim-easyops ~/.config/nvim/pack/plugins/start/vim-easyops
 ```
 
 ---

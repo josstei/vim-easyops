@@ -196,6 +196,10 @@ These menus are available by default in vim-easyops. Each menu includes a set of
 
 (*Menus for other languages and tools are automatically available if the project manifest is detected*)
 
+## Works Great with [vim-easyenv](https://github.com/josstei/vim-easyenv)
+
+Use vim-easyops alongside [vim-easyenv](https://github.com/josstei/vim-easyenv) for seamless environment management in Vim/Neovim. Quickly switch environments with vim-easyenv, then use vim-easyops’ unified menu to run project commands and version control—all without leaving your editor. Together, they streamline your workflow for maximum productivity.
+
 ---
 
 ## License

@@ -1,3 +1,5 @@
+![Stable](https://img.shields.io/badge/status-stable-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue)
+
 # vim-easyops
 
 `vim-easyops` is a Vim plugin that delivers a unified, extensible menu for common development tasks—making it painless to work with files, projects, and version control within Vim. It detects your project type and provides context-aware commands for file operations, Git, build tools, package managers, and more.

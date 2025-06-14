@@ -4,8 +4,7 @@ function! easyops#command#main#commands() abort
 				\ { 'label' : 'Git',     'command':'menu:git'}, 
 				\ { 'label' : 'Window',  'command':'menu:window'}, 
 				\ { 'label' : 'File',    'command':'menu:file'}, 
-				\ { 'label' : 'Code',    'command':'menu:code|manifest'}, 
-				\ { 'label' : 'Config',  'command':'menu:easyopsconfig'}
+				\ { 'label' : 'Code',    'command':'menu:code|manifest'}
 				\ ]
 		endif
     if !exists('g:easyops_menu_main')
